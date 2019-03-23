@@ -14,7 +14,7 @@ import { GadgetsService} from '../gadgets.service';
 export class HomePage {
   nombre:string="";
   correo:string="";
-  logeado:boolean = false;
+  logeado:boolean = true;
   arreglo:Array<boolean>=[];
   constructor(
     private googlePlus: GooglePlus,
