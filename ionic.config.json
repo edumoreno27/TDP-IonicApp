@@ -1,7 +1,8 @@
 {
-  "name": "TDP",
+  "name": "SmartMirrorApp",
   "integrations": {
     "cordova": {}
   },
-  "type": "angular"
+  "type": "angular",
+  "id": "e48b71c3"
 }

@@ -11,7 +11,7 @@ export class GadgetsService {
 
     let data = {};
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    let url = proxyurl+'http://edumoreno27-001-site1.etempurl.com/Gadget/ObtenerLista';
+    let url = proxyurl+'http://smartmirror-api.azurewebsites.net/GetGadgetStatus';
     return this.http.post(url, data)
       .toPromise()
       .then(data => {
@@ -27,7 +27,7 @@ export class GadgetsService {
 
     let data = {vistas:vistas};
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    let url = proxyurl+'http://edumoreno27-001-site1.etempurl.com/Gadget/ActualizarLista';
+    let url = proxyurl+'http://smartmirror-api.azurewebsites.net/EditGadgetStatus';
     return this.http.post(url, data)
       .toPromise()
       .then(data => {

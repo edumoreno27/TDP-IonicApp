@@ -4,7 +4,10 @@ import { NativeStorage } from '@ionic-native/native-storage/ngx';
 import { LoadingController, AlertController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { GadgetsService} from '../gadgets.service';
+import { GadgetsProvider} from '../servicios/gadgets/gadget';
+import * as firebase from 'firebase/app';
+import {AngularFireAuth} from 'angularfire2/auth';
+
 
 @Component({
   selector: 'app-home',
@@ -14,7 +17,7 @@ import { GadgetsService} from '../gadgets.service';
 export class HomePage {
   nombre:string="";
   correo:string="";
-  logeado:boolean = true;
+  logeado:boolean = false;
   arreglo:Array<boolean>=[];
   constructor(
     private googlePlus: GooglePlus,
@@ -23,7 +26,8 @@ export class HomePage {
     private router: Router,
     private platform: Platform,
     public alertController: AlertController,
-    public proveedor:GadgetsService
+    public proveedor:GadgetsProvider,
+    private afAuth:AngularFireAuth
   ) { 
     
     this.obtenerGadgets();
@@ -36,27 +40,28 @@ export class HomePage {
     this.presentLoading(loading);
     
     this.googlePlus.login({
-      'scopes': '', // optional - space-separated list of scopes, If not included or empty, defaults to `profile` and `email`.
-      'webClientId': environment.googleWebClientId, // optional - clientId of your Web application from Credentials settings of your project - On Android, this MUST be included to get an idToken. On iOS, it is not required.
-      'offline': true, // Optional, but requires the webClientId - if set to true the plugin will also return a serverAuthCode, which can be used to grant offline access to a non-Google server
+      'scopes': '', 
+      'webClientId': environment.googleWebClientId, 
+      'offline': true,
     })
       .then(user => {
         this.logeado= true;
         this.nombre=user.displayName;
         this.correo=user.email;
-        console.log(user);
-        //save user data on the native storage
+        console.log(user);        
+
+        this.afAuth.auth.signInWithCredential(
+          firebase.auth.GoogleAuthProvider.credential(user.idToken)
+        ).then( data => {
+          console.log(data);
+        });
+ 
         this.nativeStorage.setItem('google_user', {
           name: user.displayName,
           email: user.email,
           picture: user.imageUrl
         })
-          .then(() => {
-            let user = this.nativeStorage.getItem('google_user').then(data => {
-              console.log(data);
-            });
-
-            // this.router.navigate(["/user"]);
+          .then(() => {            
           }, (error) => {
             console.log(error);
           })
