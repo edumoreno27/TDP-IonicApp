@@ -7,9 +7,11 @@ export class GadgetsService {
 
   constructor(public http: Http) { }
 
-  obtenerGadgets() {
+  obtenerGadgets(id) {
 
-    let data = {};
+    let data = {
+      id:id
+    };
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
     let url = proxyurl+'http://smartmirror-api.azurewebsites.net/GetGadgetStatus';
     return this.http.post(url, data)
@@ -23,9 +25,9 @@ export class GadgetsService {
 
 
   }
-  actualizar(vistas) {
+  actualizar(userId,lstInside) {
 
-    let data = {vistas:vistas};
+    let data = {userId:userId,lstInside:lstInside};
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
     let url = proxyurl+'http://smartmirror-api.azurewebsites.net/EditGadgetStatus';
     return this.http.post(url, data)

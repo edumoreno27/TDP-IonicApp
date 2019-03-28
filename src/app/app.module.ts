@@ -11,9 +11,12 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { GooglePlus } from '@ionic-native/google-plus/ngx';
 import { NativeStorage } from '@ionic-native/native-storage/ngx';
+
 import {GadgetsService} from './datos/gadgets/gadgets.service';
+import {UsuarioService} from './datos/usuarios/usuario.service';
 import {AngularFireModule} from 'angularfire2';
 import {AngularFireAuthModule} from 'angularfire2/auth';
+import { IonicStorageModule } from '@ionic/storage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBSISSOwwfhX6HrO8M8z683nGyJa77aIKo",
@@ -29,6 +32,7 @@ const firebaseConfig = {
   entryComponents: [],
   imports: [BrowserModule,
      IonicModule.forRoot(),
+     IonicStorageModule.forRoot(),
       AppRoutingModule,
       AngularFireModule.initializeApp(firebaseConfig),
       AngularFireAuthModule,
@@ -38,8 +42,9 @@ const firebaseConfig = {
     StatusBar,
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    NativeStorage,
+    NativeStorage,    
     GooglePlus,
+    UsuarioService,
     GadgetsService
     
   ],

@@ -9,12 +9,12 @@ export class GadgetsProvider {
 
     constructor(public http: Http, public _gs: GadgetsService) { }
 
-    obtenerGadgets() {
+    obtenerGadgets(id) {
 
-        return this._gs.obtenerGadgets();
+        return this._gs.obtenerGadgets(id);
 
     }
-    actualizar(vistas) {
-        return this._gs.actualizar(vistas);
+    actualizar(userId,lstInside) {
+        return this._gs.actualizar(userId,lstInside);
     }
 }
