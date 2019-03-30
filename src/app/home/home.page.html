@@ -14,53 +14,122 @@
     </div>
     <br/>
     <ion-row *ngIf="logeado == false">
+        <ion-col col-12 col-md-12>
+            <ion-item>
+                <ion-input placeholder="Número de habitación" [(ngModel)]="numerohabitacion"></ion-input>
+            </ion-item>
+        </ion-col>
+    </ion-row>
+    <br/>
+    <ion-row *ngIf="logeado == false">
         <ion-col>
             <ion-button class="log-in-button" color="danger" expand="block" (click)="doGoogleLogin()">
-                LOG IN WITH GOOGLE
+                GOOGLE
             </ion-button>
         </ion-col>
     </ion-row>
-    <ion-row style="width:50%; margin:auto;" *ngIf="logeado == true">
-        <ion-item style="border: 0px; width:100%;">
-            <ion-label>Bolsa</ion-label>
-            <ion-checkbox (ionChange)="changeEstado($event)" [(ngModel)]="arreglo[0]" slot="end"></ion-checkbox>
-        </ion-item>
+
+    <ion-row class="filaGadget" *ngIf="logeado == true">
+        <ion-col col-8>
+            <ion-item (click)="abrirOrden(orders[0])" style="border: 0px; width:100%;" lines="none">
+                <ion-label>Bolsa</ion-label>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4>
+            <ion-item style="border: 0px; width:100%;" lines="none">
+                <ion-checkbox (ionChange)="changeEstado($event)" [(ngModel)]="arreglo[0]" slot="end"></ion-checkbox>
+            </ion-item>
+        </ion-col>
     </ion-row>
-    <ion-row style="width:50%;  margin:auto;" *ngIf="logeado == true">
-        <ion-item style="border: 0px; width:100%;">
-            <ion-label>Clima</ion-label>
-            <ion-checkbox (ionChange)="changeEstado($event)" [(ngModel)]="arreglo[1]" slot="end"></ion-checkbox>
-        </ion-item>
+    <ion-row class="filaGadget" *ngIf="logeado == true">
+        <ion-col col-8>
+            <ion-item (click)="abrirOrden(orders[1])" style="border: 0px; width:100%;" lines="none">
+                <ion-label>Clima</ion-label>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4>
+            <ion-item style="border: 0px; width:100%;" lines="none">
+                <ion-checkbox (ionChange)="changeEstado($event)" [(ngModel)]="arreglo[1]" slot="end"></ion-checkbox>
+            </ion-item>
+        </ion-col>
     </ion-row>
-    <ion-row style="width:50%;  margin:auto;" *ngIf="logeado == true">
-        <ion-item style="border: 0px; width:100%;">
-            <ion-label>Hora</ion-label>
-            <ion-checkbox (ionChange)="changeEstado($event)" [(ngModel)]="arreglo[2]" slot="end"></ion-checkbox>
-        </ion-item>
+    <ion-row class="filaGadget" *ngIf="logeado == true">
+        <ion-col col-8>
+            <ion-item (click)="abrirOrden(orders[2])" style="border: 0px; width:100%;" lines="none">
+                <ion-label>Hora</ion-label>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4>
+            <ion-item style="border: 0px; width:100%;" lines="none">
+                <ion-checkbox (ionChange)="changeEstado($event)" [(ngModel)]="arreglo[2]" slot="end"></ion-checkbox>
+            </ion-item>
+        </ion-col>
     </ion-row>
-    <ion-row style="width:50%;  margin:auto;" *ngIf="logeado == true">
-        <ion-item style="border: 0px; width:100%;">
-            <ion-label>Noticias</ion-label>
-            <ion-checkbox (ionChange)="changeEstado($event)" [(ngModel)]="arreglo[3]" slot="end"></ion-checkbox>
-        </ion-item>
+    <ion-row class="filaGadget" *ngIf="logeado == true">
+        <ion-col col-8>
+            <ion-item (click)="abrirOrden(orders[3])" style="border: 0px; width:100%;" lines="none">
+                <ion-label>Noticias</ion-label>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4>
+            <ion-item style="border: 0px; width:100%;" lines="none">
+                <ion-checkbox (ionChange)="changeEstado($event)" [(ngModel)]="arreglo[3]" slot="end"></ion-checkbox>
+            </ion-item>
+        </ion-col>
     </ion-row>
-    <ion-row style="width:50%;  margin:auto;" *ngIf="logeado == true">
-        <ion-item style="border: 0px; width:100%;">
-            <ion-label>Agenda</ion-label>
-            <ion-checkbox (ionChange)="changeEstado($event)" [(ngModel)]="arreglo[4]" slot="end"></ion-checkbox>
-        </ion-item>
+    <ion-row class="filaGadget" *ngIf="logeado == true">
+        <ion-col col-8>
+            <ion-item (click)="abrirOrden(orders[4])" style="border: 0px; width:100%;" lines="none">
+                <ion-label>Agenda</ion-label>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4>
+            <ion-item style="border: 0px; width:100%;" lines="none">
+                <ion-checkbox (ionChange)="changeEstado($event)" [(ngModel)]="arreglo[4]" slot="end"></ion-checkbox>
+            </ion-item>
+        </ion-col>
     </ion-row>
-    <ion-row style="width:50%;  margin:auto;" *ngIf="logeado == true">
-        <ion-item style="border: 0px; width:100%;">
-            <ion-label>Correo</ion-label>
-            <ion-checkbox (ionChange)="changeEstado($event)" [(ngModel)]="arreglo[5]" slot="end"></ion-checkbox>
-        </ion-item>
+    <ion-row class="filaGadget" *ngIf="logeado == true">
+        <ion-col col-8>
+            <ion-item (click)="abrirOrden(orders[5])" style="border: 0px; width:100%;" lines="none">
+                <ion-label>Correo</ion-label>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4>
+            <ion-item style="border: 0px; width:100%;" lines="none">
+                <ion-checkbox (ionChange)="changeEstado($event)" [(ngModel)]="arreglo[5]" slot="end"></ion-checkbox>
+            </ion-item>
+        </ion-col>
+    </ion-row>
+    <ion-row class="filaGadget" *ngIf="logeado == true">
+        <ion-col col-8>
+            <ion-item (click)="abrirOrden(orders[6])" style="border: 0px; width:100%;" lines="none">
+                <ion-label>Música</ion-label>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4>
+            <ion-item style="border: 0px; width:100%;" lines="none">
+                <ion-checkbox (ionChange)="changeEstado($event)" [(ngModel)]="arreglo[6]" slot="end"></ion-checkbox>
+            </ion-item>
+        </ion-col>
+    </ion-row>
+    <ion-row class="filaGadget" *ngIf="logeado == true">
+        <ion-col col-8>
+            <ion-item (click)="abrirOrden(orders[7])" style="border: 0px; width:100%;" lines="none">
+                <ion-label>Servicios hotel</ion-label>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4>
+            <ion-item style="border: 0px; width:100%;" lines="none">
+                <ion-checkbox (ionChange)="changeEstado($event)" [(ngModel)]="arreglo[7]" slot="end"></ion-checkbox>
+            </ion-item>
+        </ion-col>
     </ion-row>
     <br/>
     <ion-row *ngIf="logeado == true">
         <ion-col>
             <ion-button class="log-in-button" color="primary" expand="block" (click)="logout()">
-                LOG OUT
+                CERRAR SESIÓN
             </ion-button>
         </ion-col>
     </ion-row>

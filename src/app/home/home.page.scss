@@ -1,1 +1,15 @@
+.filaGadget {
+    width: 70% !important;
+    margin: auto !important;
+}
 
+ion-item.item-native.item-inner {
+    --ion-item-border-bottom: 0px !important;
+    --border-bottom: 0px !important;
+    border-bottom: 0px !important;
+}
+
+.item-inner {
+    --ion-border-bottom: 0px !important;
+    --border-bottom: 0px !important;
+}

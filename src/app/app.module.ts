@@ -17,7 +17,7 @@ import {UsuarioService} from './datos/usuarios/usuario.service';
 import {AngularFireModule} from 'angularfire2';
 import {AngularFireAuthModule} from 'angularfire2/auth';
 import { IonicStorageModule } from '@ionic/storage';
-
+import {ModalOrderPageModule} from '../app/modal-order/modal-order.module';
 const firebaseConfig = {
   apiKey: "AIzaSyBSISSOwwfhX6HrO8M8z683nGyJa77aIKo",
   authDomain: "proyectotdp-d9e6d.firebaseapp.com",
@@ -37,6 +37,7 @@ const firebaseConfig = {
       AngularFireModule.initializeApp(firebaseConfig),
       AngularFireAuthModule,
     HttpClientModule,
+    ModalOrderPageModule,
     HttpModule],
   providers: [
     StatusBar,

@@ -7,12 +7,13 @@ export class UsuarioService {
 
   constructor(public http:Http) { }
 
-  registrarUsuario(email,username,refreshtoken,accestoken) {
-
+  registrarUsuario(email,username,refreshtoken,accestoken,roomNumber:number) {
+    
     let data = {email:email,
-      username: username,
+      userName: username,
         refreshtoken: refreshtoken,
-          accesstoken: accestoken};
+          accesstoken: accestoken,
+          roomNumber: +roomNumber};
 
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
     let url = proxyurl + 'http://smartmirror-api.azurewebsites.net/CreateUser';
@@ -26,5 +27,23 @@ export class UsuarioService {
       );
 
 
+  }
+
+  cerrarsesion(id ,roomNumber){
+    let data = {id:id,
+   
+          roomNumber: +roomNumber};
+
+    const proxyurl = "https://cors-anywhere.herokuapp.com/";
+    let url = proxyurl + 'http://smartmirror-api.azurewebsites.net/AfterLogout';
+    return this.http.post(url, data)
+      .toPromise()
+      .then(data => {
+        let rs = data.json()
+        return rs;
+      }).catch(e => { console.log(e); return e; }
+
+      );
+    
   }
 }

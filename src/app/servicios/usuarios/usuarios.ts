@@ -9,6 +9,7 @@ import { Storage } from '@ionic/storage';
 export class UsuariosProvider {
 
     public usuario:any;
+    public habitacion:any;
 
     constructor(public http: Http, public _us: UsuarioService,public storage:Storage) 
     {
@@ -16,13 +17,17 @@ export class UsuariosProvider {
 
      }
 
-     registrarUsuario(email,username,refreshtoken,accestoken) {
+     registrarUsuario(email,username,refreshtoken,accestoken,roomNumber) {
 
-        return this._us.registrarUsuario(email,username,refreshtoken,accestoken);
+        return this._us.registrarUsuario(email,username,refreshtoken,accestoken,roomNumber);
 
     }
 
-    guardar_storage(user){
+    cerrarsesion(id ,roomNumber){
+        return this._us.cerrarsesion(id,roomNumber);
+      }
+
+    guardar_storage(user,habitacion){
         let promesa = new Promise((resolve, reject) => {
             this.storage.set("user", JSON.stringify(user))
             .then(() => {  console.log('usuarioGuardado');  
@@ -33,6 +38,16 @@ export class UsuariosProvider {
                 resolve();
               console.log(error);
             })
+
+            this.storage.set("room", JSON.stringify(habitacion))
+            .then(() => {              
+            this.habitacion=habitacion;         
+            resolve();
+            }, (error) => {
+                resolve();
+              console.log(error);
+            })
+
         });
         return promesa;
     }
@@ -45,7 +60,15 @@ export class UsuariosProvider {
                 console.log(usuario);
               if (usuario) {
                 this.usuario = JSON.parse(usuario);
+              }
+              resolve();
+            })
 
+            this.storage.get("room")
+            .then(room => {
+                
+              if (room) {
+                this.habitacion=room;
               }
               resolve();
             })
@@ -54,6 +77,8 @@ export class UsuariosProvider {
     }
     delete(){
         this.storage.remove('user').then(data =>{            
+        });
+        this.storage.remove('room').then(data =>{            
         });
     }
 }

@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { GooglePlus } from '@ionic-native/google-plus/ngx';
 
-import { LoadingController, AlertController, Platform } from '@ionic/angular';
+import { LoadingController, AlertController, Platform, ModalController } from '@ionic/angular';
+import { ModalOrderPage } from '../modal-order/modal-order.page';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { GadgetsProvider } from '../servicios/gadgets/gadget';
@@ -21,15 +22,17 @@ export class HomePage {
   accesstoken: string = "";
   logeado: boolean = false;
   arreglo: Array<boolean> = [];
+  orders: Array<any> = [];
   usuario: any;
+  numerohabitacion: any;
+
   constructor(
     private googlePlus: GooglePlus,
-
     public loadingController: LoadingController,
     private router: Router,
     private platform: Platform,
     public alertController: AlertController,
-    public proveedor: GadgetsProvider,
+    public proveedor: GadgetsProvider, public modalController: ModalController,
     private afAuth: AngularFireAuth, public _us: UsuariosProvider
   ) {
 
@@ -43,12 +46,19 @@ export class HomePage {
         console.log(" ENTRO AQUI");
         this.logeado = true;
         this.obtenerGadgets(this.usuario.id);
+        this.obtenerOrdenGadgets(this.usuario.id);
         this.nombre = this.usuario.userName;
         this.correo = this.usuario.email;
 
       }
     });
+    // let idnuevo = 'e21cd1c7-cf5a-491b-b72f-37e7d4db105f';
+    // this.obtenerGadgets(idnuevo);
+    // this.obtenerOrdenGadgets(idnuevo);
 
+  }
+
+  ionViewDidLoad(){
 
   }
 
@@ -59,7 +69,7 @@ export class HomePage {
     loading.present();
 
     this.googlePlus.login({
-      'scopes': '',
+      'scopes': 'https://mail.google.com/ https://www.googleapis.com/auth/calendar',
       'webClientId': environment.googleWebClientId,
       'offline': true,
     })
@@ -68,21 +78,22 @@ export class HomePage {
         this.nombre = user.displayName;
         this.correo = user.email;
         this.accesstoken = user.accessToken;
-
+        console.log(user);
 
         this.afAuth.auth.signInWithCredential(
           firebase.auth.GoogleAuthProvider.credential(user.idToken)
+
         ).then(data => {
 
-          this._us.registrarUsuario(user.email, user.displayName, data.refreshToken, this.accesstoken).then(usuario => {
+          console.log(data);
 
-            this._us.guardar_storage(usuario).then(menu => {
+          this._us.registrarUsuario(user.email, user.displayName, user.serverAuthCode, this.accesstoken, this.numerohabitacion).then(usuario => {
+
+            this._us.guardar_storage(usuario, this.numerohabitacion).then(menu => {
               loading.dismiss();
               this.obtenerGadgets(this._us.usuario.id);
+              this.obtenerOrdenGadgets(this._us.usuario.id);
             });
-
-
-
           }
 
           );
@@ -115,16 +126,13 @@ export class HomePage {
   }
 
   async logout() {
-
-    this.googlePlus.disconnect();
     this.logeado = false;
+    this.googlePlus.disconnect();
+
     this._us.delete();
-    
-    // this.googlePlus.logout().then(res => {
-    //   this.nombre = "";
-    //   this.correo = "";
-      
-    // });
+    this._us.cerrarsesion(this._us.usuario.id, this._us.habitacion).then(usuario => {
+
+    });
   }
 
   async obtenerGadgets(id) {
@@ -134,14 +142,40 @@ export class HomePage {
     });
   }
 
+  async obtenerOrdenGadgets(id) {
+    this.proveedor.obtenerOrderGadgets(id).then(data => {
+      console.log(data);
+      this.orders = data;
+    });
+  }
   async changeEstado(event) {
     this.proveedor.actualizar(this._us.usuario.id, this.arreglo).then(data => {
       if (data) {
         this.arreglo = data;
+        // this.obtenerGadgets(1);
         console.log("SE ACTUALIZO");
 
       }
 
     });
+  }
+
+  async abrirOrden(orden) {
+    this.proveedor.obtenerOrderGadgets(this._us.usuario.id).then(data=>{
+      this.orders=data;
+      this.router.navigate(['/modal-order', { orden: orden, orders: this.orders }]);
+    });
+    
+    // const modal = await this.modalController.create({
+    //   component: ModalOrderPage,
+    //   componentProps: { orden: orden, orders: this.orders }
+    // });
+    // await modal.present();
+    // modal.onDidDismiss().then(data => {
+    //   this.obtenerOrdenGadgets(this._us.usuario.id);
+    // });
+
+    
+
   }
 }

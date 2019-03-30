@@ -14,7 +14,17 @@ export class GadgetsProvider {
         return this._gs.obtenerGadgets(id);
 
     }
-    actualizar(userId,lstInside) {
-        return this._gs.actualizar(userId,lstInside);
+    actualizar(userId, lstInside) {
+        return this._gs.actualizarEstado(userId, lstInside);
+    }
+
+    obtenerOrderGadgets(id) {
+        return this._gs.obtenerOrderGadgets(id);
+
+    }
+
+    actualizarOrder(userId, lstInside) {
+        return this._gs.actualizarOrder(userId,lstInside);
+
     }
 }
