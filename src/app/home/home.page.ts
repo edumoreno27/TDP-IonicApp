@@ -69,13 +69,13 @@ export class HomePage {
       });
   }
 
-  ionViewDidEnter(){
+  ionViewDidEnter() {
     console.log("ENTRO");
     this.obtenerGadgets(this.usuario.id);
   }
 
   ionViewDidLoad() {
-    
+
   }
 
   async doGoogleLogin() {
@@ -201,34 +201,38 @@ export class HomePage {
       )
   }
   Analizar(arreglo2) {
-    let bool=true;
+    let bool = true;
     for (let i = 0; i < arreglo2.length; i++) {
-      for(let j=0 ; j<this.arreglo.length;j++){
-        let variable =this.arreglo[j].description.toLowerCase();
-        if ((arreglo2[i].includes('mostrar') &&  arreglo2[i].includes(variable) )|| (arreglo2[i].includes('Mostrar') &&  arreglo2[i].includes(variable) ) ) {
+      for (let j = 0; j < this.arreglo.length; j++) {
+        let variable = this.arreglo[j].description.toLowerCase();
+        if ((arreglo2[i].includes('mostrar') && arreglo2[i].includes(variable)) || (arreglo2[i].includes('Mostrar') && arreglo2[i].includes(variable))) {
           // Found world  
           console.log(variable);
-          // this.arreglo[j].isActive=true;     
-          let elemtn=document.getElementById(this.arreglo[j].gadgetId);
-          elemtn.click();
-          bool=false;
-          break;
-          
+          // this.arreglo[j].isActive=true;   
+
+          if (this.arreglo[j].isActive == false) {
+            let elemtn = document.getElementById(this.arreglo[j].gadgetId);
+            elemtn.click();
+            bool = false;
+            break;
+          }
         }
-        if ((arreglo2[i].includes('ocultar') &&  arreglo2[i].includes(variable) )|| (arreglo2[i].includes('Ocultar') &&  arreglo2[i].includes(variable) ) ) {
+        if ((arreglo2[i].includes('ocultar') && arreglo2[i].includes(variable)) || (arreglo2[i].includes('Ocultar') && arreglo2[i].includes(variable))) {
           // Found world  
           console.log(variable);
           // this.arreglo[j].isActive=false;          
-          let elemtn=document.getElementById(this.arreglo[j].gadgetId);
-          elemtn.click();
-          bool=false;
-          break;
-          
+          if (this.arreglo[j].isActive == true) {
+            let elemtn = document.getElementById(this.arreglo[j].gadgetId);
+            elemtn.click();
+            bool = false;
+            break;
+          }
+
         }
-      }  
-      if(bool==false){
+      }
+      if (bool == false) {
         break;
-      }    
+      }
     }
     for (let i = 0; i < arreglo2.length; i++) {
       if (arreglo2[i].includes('actualizar')) {
