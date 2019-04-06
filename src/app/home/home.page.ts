@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { GooglePlus } from '@ionic-native/google-plus/ngx';
-
+import { SpeechRecognition } from '@ionic-native/speech-recognition/ngx';
 import { LoadingController, AlertController, Platform, ModalController } from '@ionic/angular';
 import { ModalOrderPage } from '../modal-order/modal-order.page';
 import { Router } from '@angular/router';
@@ -21,7 +21,7 @@ export class HomePage {
   correo: string = "";
   accesstoken: string = "";
   logeado: boolean = false;
-  arreglo: Array<boolean> = [];
+  arreglo: Array<any> = [];
   orders: Array<any> = [];
   usuario: any;
   numerohabitacion: any;
@@ -29,7 +29,7 @@ export class HomePage {
   constructor(
     private googlePlus: GooglePlus,
     public loadingController: LoadingController,
-    private router: Router,
+    private router: Router, public _speech: SpeechRecognition,
     private platform: Platform,
     public alertController: AlertController,
     public proveedor: GadgetsProvider, public modalController: ModalController,
@@ -55,11 +55,27 @@ export class HomePage {
     // let idnuevo = 'e21cd1c7-cf5a-491b-b72f-37e7d4db105f';
     // this.obtenerGadgets(idnuevo);
     // this.obtenerOrdenGadgets(idnuevo);
+    this._speech.hasPermission()
+      .then((hasPermission: boolean) => {
 
+        if (!hasPermission) {
+          this._speech.requestPermission()
+            .then(
+              () => console.log('Granted'),
+              () => console.log('Denied')
+            )
+        }
+
+      });
   }
 
-  ionViewDidLoad(){
+  ionViewDidEnter(){
+    console.log("ENTRO");
+    this.obtenerGadgets(this.usuario.id);
+  }
 
+  ionViewDidLoad() {
+    
   }
 
   async doGoogleLogin() {
@@ -149,6 +165,9 @@ export class HomePage {
     });
   }
   async changeEstado(event) {
+
+  }
+  async actualizargadgets() {
     this.proveedor.actualizar(this._us.usuario.id, this.arreglo).then(data => {
       if (data) {
         this.arreglo = data;
@@ -159,23 +178,64 @@ export class HomePage {
 
     });
   }
-
   async abrirOrden(orden) {
-    this.proveedor.obtenerOrderGadgets(this._us.usuario.id).then(data=>{
-      this.orders=data;
-      this.router.navigate(['/modal-order', { orden: orden, orders: this.orders }]);
+    this.proveedor.obtenerOrderGadgets(this._us.usuario.id).then(data => {
+      this.orders = data;
+      this.proveedor.guardar_storage(this.orders).then(data => {
+        this.router.navigate(['/modal-order', { orden: orden, orders: this.orders }]);
+      });
+
     });
-    
-    // const modal = await this.modalController.create({
-    //   component: ModalOrderPage,
-    //   componentProps: { orden: orden, orders: this.orders }
-    // });
-    // await modal.present();
-    // modal.onDidDismiss().then(data => {
-    //   this.obtenerOrdenGadgets(this._us.usuario.id);
-    // });
 
-    
 
+  }
+  startGrabation() {
+    this._speech.startListening()
+      .subscribe(
+        (matches: Array<any>) => {
+          this.Analizar(matches);
+          console.log(matches)
+
+        },
+        (onerror) => console.log('error:', onerror)
+      )
+  }
+  Analizar(arreglo2) {
+    let bool=true;
+    for (let i = 0; i < arreglo2.length; i++) {
+      for(let j=0 ; j<this.arreglo.length;j++){
+        let variable =this.arreglo[j].description.toLowerCase();
+        if ((arreglo2[i].includes('mostrar') &&  arreglo2[i].includes(variable) )|| (arreglo2[i].includes('Mostrar') &&  arreglo2[i].includes(variable) ) ) {
+          // Found world  
+          console.log(variable);
+          // this.arreglo[j].isActive=true;     
+          let elemtn=document.getElementById(this.arreglo[j].gadgetId);
+          elemtn.click();
+          bool=false;
+          break;
+          
+        }
+        if ((arreglo2[i].includes('ocultar') &&  arreglo2[i].includes(variable) )|| (arreglo2[i].includes('Ocultar') &&  arreglo2[i].includes(variable) ) ) {
+          // Found world  
+          console.log(variable);
+          // this.arreglo[j].isActive=false;          
+          let elemtn=document.getElementById(this.arreglo[j].gadgetId);
+          elemtn.click();
+          bool=false;
+          break;
+          
+        }
+      }  
+      if(bool==false){
+        break;
+      }    
+    }
+    for (let i = 0; i < arreglo2.length; i++) {
+      if (arreglo2[i].includes('actualizar')) {
+        this.actualizargadgets();
+        break;
+      }
+
+    }
   }
 }

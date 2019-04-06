@@ -11,13 +11,15 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { GooglePlus } from '@ionic-native/google-plus/ngx';
 import { NativeStorage } from '@ionic-native/native-storage/ngx';
-
+import {MatchesOrderPipe} from '../app/servicios/filter/filter';
 import {GadgetsService} from './datos/gadgets/gadgets.service';
 import {UsuarioService} from './datos/usuarios/usuario.service';
 import {AngularFireModule} from 'angularfire2';
 import {AngularFireAuthModule} from 'angularfire2/auth';
 import { IonicStorageModule } from '@ionic/storage';
 import {ModalOrderPageModule} from '../app/modal-order/modal-order.module';
+import { SpeechRecognition } from '@ionic-native/speech-recognition/ngx';
+
 const firebaseConfig = {
   apiKey: "AIzaSyBSISSOwwfhX6HrO8M8z683nGyJa77aIKo",
   authDomain: "proyectotdp-d9e6d.firebaseapp.com",
@@ -41,6 +43,7 @@ const firebaseConfig = {
     HttpModule],
   providers: [
     StatusBar,
+    SpeechRecognition,
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     NativeStorage,    

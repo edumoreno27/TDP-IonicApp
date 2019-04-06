@@ -11,22 +11,28 @@ import { UsuariosProvider } from '../servicios/usuarios/usuarios';
 })
 export class ModalOrderPage implements OnInit {
   order: any;
-  orders: string[];
+  orders: Array<any> = [];
   color1: string;
   arreglo: Array<any> = [];
   colores: string[];
-  enviar:Array<any>=[];
-  constructor(public _mcl: ModalController, public route: ActivatedRoute,public proveedor:GadgetsProvider,public _us:UsuariosProvider) {
+  enviar: Array<any> = [];
+  description: any;
+  constructor(public _mcl: ModalController, public route: ActivatedRoute, public proveedor: GadgetsProvider, public _us: UsuariosProvider) {
     this.order = this.route.snapshot.paramMap.get('orden');
-    this.orders = (this.route.snapshot.paramMap.get('orders')).split(',');
-    console.log(this.order);
-    console.log(this.orders);
+    this.proveedor.cargar_storage().then(data => {
+      this.orders = this.proveedor.orders;
+      this.inicializarArreglo(this.order);
+      console.log(this.order);
+      console.log(this.orders);
+    });
+
+
     //     this.route.params.subscribe(params => {
     //       this.order = params['orden']; 
     //       this.orders = params['orders']; 
 
     //  });
-    this.inicializarArreglo(this.order);
+
   }
 
   ngOnInit() {
@@ -38,43 +44,67 @@ export class ModalOrderPage implements OnInit {
 
   inicializarArreglo(order) {
     for (let i = 0; i < this.orders.length; i++) {
-      if (order == this.orders[i]) {
-        let objeto = { order: this.orders[i], seleccionado: true, posicion: i };
-        this.arreglo.push(objeto);
+      if (order == this.orders[i].order) {
+        this.orders[i].selected = true;
+        this.orders[i].position = i;
+        this.description = this.orders[i].description;
       } else {
-        let objeto = { order: this.orders[i], seleccionado: false, posicion: i };
-        this.arreglo.push(objeto);
+        this.orders[i].selected = false;
+        this.orders[i].position = i;
       }
     }
   }
 
   CambiarOrden(obj) {
-    this.enviar=[];
-    let objeto=undefined;
-    for (let i = 0; i < this.arreglo.length; i++) {
-      if (this.order == this.arreglo[i].order) {
-        objeto = { order: this.arreglo[i].order, seleccionado: true, posicion: i };
+    console.log(obj);
+    this.enviar = [];
+    let objeto = undefined;
+    let indexaux = this.orders.indexOf(obj);
+    let indice = 0;
+    for (let i = 0; i < this.orders.length; i++) {
+      if (this.order == this.orders[i].order) {
+        indice = i;
+        console.log(i);
+        ///objeto = { description: this.orders[i].description, order: this.orders[i].order, selected: true, position: i };
       }
     }
-    this.order=obj.order;
-    this.arreglo[objeto.posicion].order=obj.order;
-    this.arreglo[obj.posicion].order=objeto.order;
+    // this.order = obj.order;
     
-    
-    
-    console.log(this.arreglo);
-    for (let i = 0; i < this.arreglo.length; i++) {
-      this.enviar.push(this.arreglo[i].order);
+    let orderaux = this.orders[indexaux].order;
+    let descriptionaux = this.orders[indexaux].description;
+    let selectedaux = this.orders[indexaux].selected;
+    console.log(orderaux);
+    this.orders[indexaux].order = this.orders[indice].order;
+    this.orders[indexaux].description = this.orders[indice].description;
+    this.orders[indexaux].selected = this.orders[indice].selected;
 
-    } 
+    this.orders[indice].order = orderaux;
+    this.orders[indice].description = descriptionaux;
+    this.orders[indice].selected = selectedaux;
 
-    this._us.cargar_storage().then(data => {
-      this.proveedor.actualizarOrder(this._us.usuario.id,this.enviar).then(orders => {
-          this.enviar=orders;
-      }); 
-    });
-    console.log(this.enviar)
+
+
+
+    console.log(this.orders);
+
   }
 
-   
+  actualizargadgets() {
+
+    this._us.cargar_storage().then(data => {
+      this.proveedor.actualizarOrder(this._us.usuario.id, this.orders).then(orders => {
+        this.proveedor.guardar_storage(orders).then(data => {
+          this.orders = this.proveedor.orders;
+          for (let i = 0; i < this.orders.length; i++) {
+            if(this.orders[i].description == this.description){
+              this.order=this.orders[i].order;
+            }
+
+          }
+          this.inicializarArreglo(this.order);
+        });
+
+      });
+    });
+  }
 }

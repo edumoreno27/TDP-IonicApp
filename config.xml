@@ -87,5 +87,6 @@
     <plugin name="cordova-plugin-splashscreen" spec="^5.0.2" />
     <plugin name="cordova-plugin-nativestorage" spec="2.3.2" />
     <plugin name="cordova-sqlite-storage" spec="3.2.0" />
+    <plugin name="cordova-plugin-speechrecognition" spec="1.2.0" />
     <engine name="android" spec="7.1.4" />
 </widget>
