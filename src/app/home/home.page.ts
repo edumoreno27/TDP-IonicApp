@@ -55,18 +55,7 @@ export class HomePage {
     // let idnuevo = 'e21cd1c7-cf5a-491b-b72f-37e7d4db105f';
     // this.obtenerGadgets(idnuevo);
     // this.obtenerOrdenGadgets(idnuevo);
-    this._speech.hasPermission()
-      .then((hasPermission: boolean) => {
-
-        if (!hasPermission) {
-          this._speech.requestPermission()
-            .then(
-              () => console.log('Granted'),
-              () => console.log('Denied')
-            )
-        }
-
-      });
+    
   }
 
   ionViewDidEnter() {
@@ -214,6 +203,7 @@ export class HomePage {
             let elemtn = document.getElementById(this.arreglo[j].gadgetId);
             elemtn.click();
             bool = false;
+            this.actualizargadgets();
             break;
           }
         }
@@ -225,6 +215,7 @@ export class HomePage {
             let elemtn = document.getElementById(this.arreglo[j].gadgetId);
             elemtn.click();
             bool = false;
+            this.actualizargadgets();
             break;
           }
 
