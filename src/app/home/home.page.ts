@@ -55,7 +55,7 @@ export class HomePage {
     // let idnuevo = 'e21cd1c7-cf5a-491b-b72f-37e7d4db105f';
     // this.obtenerGadgets(idnuevo);
     // this.obtenerOrdenGadgets(idnuevo);
-    
+
   }
 
   ionViewDidEnter() {
@@ -68,52 +68,66 @@ export class HomePage {
   }
 
   async doGoogleLogin() {
-    const loading = await this.loadingController.create({
-      message: 'Iniciando sesión...'
-    });
-    loading.present();
+    console.log(this.numerohabitacion);
+    if (this.numerohabitacion == undefined || this.numerohabitacion == '') {
+      this.presentAlert2();
+    } else {
 
-    this.googlePlus.login({
-      'scopes': 'https://mail.google.com/ https://www.googleapis.com/auth/calendar',
-      'webClientId': environment.googleWebClientId,
-      'offline': true,
-    })
-      .then(user => {
-        this.logeado = true;
-        this.nombre = user.displayName;
-        this.correo = user.email;
-        this.accesstoken = user.accessToken;
-        console.log(user);
+      const loading = await this.loadingController.create({
+        message: 'Iniciando sesión...'
+      });
+      loading.present();
 
-        this.afAuth.auth.signInWithCredential(
-          firebase.auth.GoogleAuthProvider.credential(user.idToken)
-
-        ).then(data => {
-
-          console.log(data);
-
-          this._us.registrarUsuario(user.email, user.displayName, user.serverAuthCode, this.accesstoken, this.numerohabitacion).then(usuario => {
-
-            this._us.guardar_storage(usuario, this.numerohabitacion).then(menu => {
-              loading.dismiss();
-              this.obtenerGadgets(this._us.usuario.id);
-              this.obtenerOrdenGadgets(this._us.usuario.id);
-            });
-          }
-
-          );
-
-
-        });
-
-
-      }, err => {
-        console.log(err);
-        if (!this.platform.is('cordova')) {
-          this.presentAlert();
-        }
-        loading.dismiss();
+      this.googlePlus.login({
+        'scopes': 'https://mail.google.com/ https://www.googleapis.com/auth/calendar',
+        'webClientId': environment.googleWebClientId,
+        'offline': true,
       })
+        .then(user => {
+          
+          this.nombre = user.displayName;
+          this.correo = user.email;
+          this.accesstoken = user.accessToken;
+          console.log(user);
+
+          this.afAuth.auth.signInWithCredential(
+            firebase.auth.GoogleAuthProvider.credential(user.idToken)
+
+          ).then(data => {
+
+            console.log(data);
+
+            this._us.registrarUsuario(user.email, user.displayName, user.serverAuthCode, this.accesstoken, this.numerohabitacion).then(usuario => {
+              console.log(usuario);
+              if(usuario.status == false){
+                loading.dismiss();
+                this.presentAlert3();
+              }
+             else{              
+              this._us.guardar_storage(usuario, this.numerohabitacion).then(menu => {
+                this.logeado = true;
+                loading.dismiss();
+
+                this.obtenerGadgets(this._us.usuario.id);
+                this.obtenerOrdenGadgets(this._us.usuario.id);
+              });
+             }
+            }
+
+            );
+
+
+          });
+
+
+        }, err => {
+          console.log(err);
+          if (!this.platform.is('cordova')) {
+            this.presentAlert();
+          }
+          loading.dismiss();
+        })
+    }
   }
 
   async presentAlert() {
@@ -125,6 +139,29 @@ export class HomePage {
     await alert.present();
   }
 
+  async presentAlert2() {
+    const alert = await this.alertController.create({
+      message: 'Ingresar número de habitación',
+      buttons: ['OK']
+    });
+
+    await alert.present();
+  }
+
+  async presentAlert3() {
+    const alert = await this.alertController.create({
+      message: 'Ya existe un usuario asignado a esta habitación, pruebe con otra',
+      buttons: [{
+        text: 'OK',
+        handler: () => {
+          this.logeado = false;
+          this.googlePlus.logout();
+        }
+      }]
+    });
+
+    await alert.present();
+  }
 
   async presentLoading(loading) {
     return await loading.present();
