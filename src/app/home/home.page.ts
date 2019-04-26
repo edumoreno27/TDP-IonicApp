@@ -9,6 +9,8 @@ import { GadgetsProvider } from '../servicios/gadgets/gadget';
 import { UsuariosProvider } from '../servicios/usuarios/usuarios';
 import * as firebase from 'firebase/app';
 import { AngularFireAuth } from 'angularfire2/auth';
+import { zip } from 'rxjs';
+import { UsuarioService } from '../datos/usuarios/usuario.service';
 
 
 @Component({
@@ -25,13 +27,13 @@ export class HomePage {
   orders: Array<any> = [];
   usuario: any;
   numerohabitacion: any;
-
+  repuesta:any;
   constructor(
     private googlePlus: GooglePlus,
     public loadingController: LoadingController,
     private router: Router, public _speech: SpeechRecognition,
     private platform: Platform,
-    public alertController: AlertController,
+    public alertController: AlertController,public _usService: UsuarioService,
     public proveedor: GadgetsProvider, public modalController: ModalController,
     private afAuth: AngularFireAuth, public _us: UsuariosProvider
   ) {
@@ -78,56 +80,83 @@ export class HomePage {
       });
       loading.present();
 
-      this.googlePlus.login({
-        'scopes': 'https://mail.google.com/ https://www.googleapis.com/auth/calendar',
-        'webClientId': environment.googleWebClientId,
-        'offline': true,
-      })
-        .then(user => {
-          
-          this.nombre = user.displayName;
-          this.correo = user.email;
-          this.accesstoken = user.accessToken;
-          console.log(user);
-
-          this.afAuth.auth.signInWithCredential(
-            firebase.auth.GoogleAuthProvider.credential(user.idToken)
-
-          ).then(data => {
-
-            console.log(data);
-
-            this._us.registrarUsuario(user.email, user.displayName, user.serverAuthCode, this.accesstoken, this.numerohabitacion).then(usuario => {
-              console.log(usuario);
-              if(usuario.status == false){
-                loading.dismiss();
-                this.presentAlert3();
-              }
-             else{              
-              this._us.guardar_storage(usuario, this.numerohabitacion).then(menu => {
-                this.logeado = true;
-                loading.dismiss();
-
-                this.obtenerGadgets(this._us.usuario.id);
-                this.obtenerOrdenGadgets(this._us.usuario.id);
-              });
-             }
+      this._usService.obtenerUsuario(this.numerohabitacion).then(data=> {
+        
+        this.repuesta=data;
+        if(this.repuesta.statusCode == 200){
+          if(this.repuesta.result){
+            if(this.repuesta.result.mirrorId != 0){
+              let idReference=this.repuesta.result.cliente.ClienteId;
+              let mirrorId=this.repuesta.result.mirrorId;   
+              this.googlePlus.login({
+                'scopes': 'https://mail.google.com/ https://www.googleapis.com/auth/calendar',
+                'webClientId': environment.googleWebClientId,
+                'offline': true,
+              })
+                .then(user => {
+                  
+                  this.nombre = user.displayName;
+                  this.correo = user.email;
+                  this.accesstoken = user.accessToken;
+                  console.log(user);
+        
+                  this.afAuth.auth.signInWithCredential(
+                    firebase.auth.GoogleAuthProvider.credential(user.idToken)
+        
+                  ).then(data => {
+        
+                    console.log(data);
+                    console.log(idReference);
+                    this._us.registrarUsuario(user.email, user.serverAuthCode, this.accesstoken, idReference,mirrorId).then(usuario => {
+                      console.log(usuario);
+                      if(usuario.status == false){
+                        loading.dismiss();
+                        this.presentAlert3();
+                      }
+                     else{              
+                      this._us.guardar_storage(usuario, this.numerohabitacion).then(menu => {
+                        this.logeado = true;
+                        loading.dismiss();
+        
+                        this.obtenerGadgets(this._us.usuario.id);
+                        this.obtenerOrdenGadgets(this._us.usuario.id);
+                      });
+                     }
+                    }
+        
+                    );
+        
+        
+                  });
+        
+        
+                }, err => {
+                  console.log(err);
+                  if (!this.platform.is('cordova')) {
+                    this.presentAlert();
+                  }
+                  loading.dismiss();
+                })
+                       
+            } else{
+              loading.dismiss();
+              this.presentarAlerta('¡Oops!','Esta habitación no cuenta con un Smart Mirror')  
             }
-
-            );
-
-
-          });
-
-
-        }, err => {
-          console.log(err);
-          if (!this.platform.is('cordova')) {
-            this.presentAlert();
+          } else{
+            loading.dismiss();
+            this.presentarAlerta('¡Oops!','Esta habitación no se encuentra disponible')
           }
+        } else{
           loading.dismiss();
-        })
-    }
+          this.presentarAlerta('Error','Este número de habitación no existe')
+        }
+
+
+      });
+
+     
+      
+      }
   }
 
   async presentAlert() {
@@ -156,6 +185,20 @@ export class HomePage {
         handler: () => {
           this.logeado = false;
           this.googlePlus.logout();
+        }
+      }]
+    });
+
+    await alert.present();
+  }
+
+  async presentarAlerta(header,Mensaje) {
+    const alert = await this.alertController.create({
+      header: header,
+      message: Mensaje,
+      buttons: [{
+        text: 'OK',
+        handler: () => {          
         }
       }]
     });

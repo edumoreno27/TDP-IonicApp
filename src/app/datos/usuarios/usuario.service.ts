@@ -7,13 +7,13 @@ export class UsuarioService {
 
   constructor(public http:Http) { }
 
-  registrarUsuario(email,username,refreshtoken,accestoken,roomNumber:number) {
+  registrarUsuario(email,refreshtoken,accestoken,idReference,mirrorId) {
     
-    let data = {email:email,
-      userName: username,
+    let data = {email:email,      
         refreshtoken: refreshtoken,
-          accesstoken: accestoken,
-          roomNumber: +roomNumber};
+          accesstoken: accestoken,          
+          idReference:idReference,
+          mirrorId:mirrorId};
 
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
     let url = proxyurl + 'http://smartmirror-api.azurewebsites.net/CreateUser';
@@ -22,7 +22,10 @@ export class UsuarioService {
       .then(data => {
         let rs = data.json()
         return rs;
-      }).catch(e => { console.log(e); return e; }
+      }).catch(e => { 
+        let error=e.json();
+        return error;
+       }
 
       );
 
@@ -46,4 +49,23 @@ export class UsuarioService {
       );
     
   }
+
+  obtenerUsuario(roomNumber){
+    
+    let url2 = 'https://tp-ires-api.azurewebsites.net/v1/management/habitacion/';
+    let url = url2;
+    return new Promise(resolve => {
+      this.http.get(url + roomNumber).subscribe(data => {
+
+        let rs = data.json();
+        console.log(rs);
+        resolve(rs);
+      }, err => {
+        let rs = err.json();
+        console.log(rs);
+        resolve(rs);
+      });
+    });
+  }
+  
 }
