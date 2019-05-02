@@ -11,7 +11,7 @@ import * as firebase from 'firebase/app';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { zip } from 'rxjs';
 import { UsuarioService } from '../datos/usuarios/usuario.service';
-
+import { md5 } from '../servicios/md5';
 
 @Component({
   selector: 'app-home',
@@ -27,16 +27,21 @@ export class HomePage {
   orders: Array<any> = [];
   usuario: any;
   numerohabitacion: any;
-  repuesta:any;
+  repuesta: any;
   constructor(
     private googlePlus: GooglePlus,
     public loadingController: LoadingController,
     private router: Router, public _speech: SpeechRecognition,
     private platform: Platform,
-    public alertController: AlertController,public _usService: UsuarioService,
+    public alertController: AlertController, public _usService: UsuarioService,
     public proveedor: GadgetsProvider, public modalController: ModalController,
     private afAuth: AngularFireAuth, public _us: UsuariosProvider
   ) {
+    let variablestring = 'edu.david2706@gmail.com';
+    console.log("variable antes dle md5", variablestring);
+
+    console.log(md5(variablestring));
+
 
     this._us.cargar_storage().then(data => {
       console.log(this._us.usuario);
@@ -70,93 +75,105 @@ export class HomePage {
   }
 
   async doGoogleLogin() {
-    console.log(this.numerohabitacion);
-    if (this.numerohabitacion == undefined || this.numerohabitacion == '') {
-      this.presentAlert2();
-    } else {
 
-      const loading = await this.loadingController.create({
-        message: 'Iniciando sesión...'
-      });
-      loading.present();
 
-      this._usService.obtenerUsuario(this.numerohabitacion).then(data=> {
-        
-        this.repuesta=data;
-        if(this.repuesta.statusCode == 200){
-          if(this.repuesta.result){
-            if(this.repuesta.result.mirrorId != 0){
-              let idReference=this.repuesta.result.cliente.ClienteId;
-              let mirrorId=this.repuesta.result.mirrorId;   
-              this.googlePlus.login({
-                'scopes': 'https://mail.google.com/ https://www.googleapis.com/auth/calendar',
-                'webClientId': environment.googleWebClientId,
-                'offline': true,
-              })
-                .then(user => {
-                  
-                  this.nombre = user.displayName;
-                  this.correo = user.email;
-                  this.accesstoken = user.accessToken;
-                  console.log(user);
-        
-                  this.afAuth.auth.signInWithCredential(
-                    firebase.auth.GoogleAuthProvider.credential(user.idToken)
-        
-                  ).then(data => {
-        
-                    console.log(data);
-                    console.log(idReference);
-                    this._us.registrarUsuario(user.email, user.serverAuthCode, this.accesstoken, idReference,mirrorId).then(usuario => {
-                      console.log(usuario);
-                      if(usuario.status == false){
-                        loading.dismiss();
-                        this.presentAlert3();
-                      }
-                     else{              
-                      this._us.guardar_storage(usuario, this.numerohabitacion).then(menu => {
-                        this.logeado = true;
-                        loading.dismiss();
-        
-                        this.obtenerGadgets(this._us.usuario.id);
-                        this.obtenerOrdenGadgets(this._us.usuario.id);
-                      });
-                     }
-                    }
-        
-                    );
-        
-        
-                  });
-        
-        
-                }, err => {
-                  console.log(err);
-                  if (!this.platform.is('cordova')) {
-                    this.presentAlert();
-                  }
-                  loading.dismiss();
-                })
-                       
-            } else{
-              loading.dismiss();
-              this.presentarAlerta('¡Oops!','Esta habitación no cuenta con un Smart Mirror')  
-            }
-          } else{
-            loading.dismiss();
-            this.presentarAlerta('¡Oops!','Esta habitación no se encuentra disponible')
+
+    const loading = await this.loadingController.create({
+      message: 'Iniciando sesión...'
+    });
+    loading.present();
+
+    // this._usService.obtenerUsuario(this.numerohabitacion).then(data=> {
+
+    //   this.repuesta=data;
+    //   if(this.repuesta.statusCode == 200){
+    //     if(this.repuesta.result){
+    //       if(this.repuesta.result.mirrorId != 0){
+
+
+
+
+    this.googlePlus.login({
+      'scopes': 'https://mail.google.com/ https://www.googleapis.com/auth/calendar',
+      'webClientId': environment.googleWebClientId,
+      'offline': true,
+    })
+      .then(user => {
+        this._usService.ObtenerUsuarioByEmail(md5(user.email)).then(response => {
+
+          this.repuesta = response;
+          console.log(this.repuesta);
+          let idReference = undefined;
+          let mirrorId = undefined;
+          let codigohabitacion=undefined;
+          if (this.repuesta.statusCode == 200) {
+            idReference = this.repuesta.result.cliente.ClienteId;
+            mirrorId = this.repuesta.result.mirrorId;
+            codigohabitacion=this.repuesta.result.codigoHabitacion;
+            this.numerohabitacion=this.repuesta.result.cliente.ClienteId;
           }
-        } else{
-          loading.dismiss();
-          this.presentarAlerta('Error','Este número de habitación no existe')
+
+
+          if (this.repuesta.statusCode == 200) {
+            this.nombre = user.displayName;
+            this.correo = user.email;
+            this.accesstoken = user.accessToken;
+            
+            console.log(user);
+
+            this.afAuth.auth.signInWithCredential(
+              firebase.auth.GoogleAuthProvider.credential(user.idToken)
+
+            ).then(data => {
+
+              console.log(data);
+              console.log(idReference);
+              this._us.registrarUsuario(user.email, user.serverAuthCode, this.accesstoken, idReference, mirrorId,codigohabitacion).then(usuario => {
+                console.log(usuario);
+                if (usuario.status == false) {
+                  loading.dismiss();
+                  this.presentAlert3();
+                }
+                else {
+                  loading.dismiss();
+                  this._us.guardar_storage(usuario, this.numerohabitacion).then(menu => {
+                    this.presentAlert4();
+
+                  });
+                }
+              }
+
+              );
+
+
+            });
+
+          } else if (this.repuesta.statusCode == 404) {
+            loading.dismiss();
+            this.presentarAlerta('Error', 'Correo del huésped no se encuentra registrado')
+          }
+
+
+
+        });
+
+
+
+
+
+      }, err => {
+        console.log(err);
+        if (!this.platform.is('cordova')) {
+          this.presentAlert();
         }
+        loading.dismiss();
+      })
 
 
-      });
 
-     
-      
-      }
+
+
+
   }
 
   async presentAlert() {
@@ -192,13 +209,32 @@ export class HomePage {
     await alert.present();
   }
 
-  async presentarAlerta(header,Mensaje) {
+  async presentAlert4() {
+    const alert = await this.alertController.create({
+      header: 'Satisfactorio',
+      message: 'Su cuenta fue asociada correctamente al Smart Mirror',
+      buttons: [{
+        text: 'OK',
+        handler: () => {
+          this.logeado = true;
+
+          this.obtenerGadgets(this._us.usuario.id);
+          this.obtenerOrdenGadgets(this._us.usuario.id);
+        }
+      }]
+    });
+
+    await alert.present();
+  }
+
+  async presentarAlerta(header, Mensaje) {
     const alert = await this.alertController.create({
       header: header,
       message: Mensaje,
       buttons: [{
-        text: 'OK',
-        handler: () => {          
+        text: 'Aceptar',
+        handler: () => {
+          this.googlePlus.logout();
         }
       }]
     });

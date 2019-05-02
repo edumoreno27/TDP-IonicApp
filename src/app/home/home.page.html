@@ -8,14 +8,18 @@
 
 <ion-content>
     <div text-center>
-        <h1>LOGUEO CON GOOGLE</h1>
+        <h1>Bienvenido a la aplicación del Hilton</h1>
+        <h1 style="white-space: normal !important; text-align: justify !important;     padding: 20px !important;
+        font-size: 20px !important;
+    " *ngIf="logeado == false">Esta aplicación servirá para poder interactuar con los gadgets que se muestran en el
+            Smart Mirror de la habitación.</h1>
         <h2 *ngIf="logeado == true">{{nombre}}</h2>
         <h2 *ngIf="logeado == true">{{correo}}</h2>
-        <br/>
+        <br />
     </div>
 
     <ion-grid>
-        <ion-row *ngIf="logeado == false">
+        <!-- <ion-row *ngIf="logeado == false">
             <ion-col col-12 col-md-12>
                 <ion-item>
                     <ion-input placeholder="Número de habitación" [(ngModel)]="numerohabitacion"></ion-input>
@@ -23,7 +27,7 @@
                 <br/>
             </ion-col>
         </ion-row>
-
+        -->
         <ion-row *ngIf="logeado == false">
             <ion-col>
                 <ion-button class="log-in-button" color="danger" expand="block" (click)="doGoogleLogin()">
@@ -32,12 +36,13 @@
             </ion-col>
         </ion-row>
         <!-- <div *ngIf="logeado == true" text-center>
-            <ion-button style="margin:auto !important; border-radius: 50px;" (click)="startGrabation()" color="primary" shape="round">
+            <ion-button style="margin:auto !important; border-radius: 50px;" (click)="startGrabation()" color="primary"
+                shape="round">
                 <ion-icon style="color:white !important;" name="mic"></ion-icon>
             </ion-button>
-            <br/>
+            <br />
         </div> -->
-        <br/>
+        <br />
         <div *ngIf="logeado == true">
             <ion-row *ngFor="let obj of arreglo" class="filaGadget">
 
@@ -48,13 +53,14 @@
                 </ion-col>
                 <ion-col col-4>
                     <ion-item style="border: 0px; width:100%;" lines="none">
-                        <ion-toggle [checked]="obj.isActive" [(ngModel)]="obj.isActive" slot="end" id="{{obj?.gadgetId}}"></ion-toggle>
+                        <ion-toggle [checked]="obj.isActive" [(ngModel)]="obj.isActive" slot="end"
+                            id="{{obj?.gadgetId}}"></ion-toggle>
                     </ion-item>
                 </ion-col>
 
             </ion-row>
         </div>
-        <br/>
+        <br />
 
     </ion-grid>
 </ion-content>

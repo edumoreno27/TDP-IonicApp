@@ -16,9 +16,9 @@ export class UsuariosProvider {
 
   }
 
-  registrarUsuario(email,refreshtoken,accestoken,idReference,mirrorId) {
+  registrarUsuario(email,refreshtoken,accestoken,idReference,mirrorId,roomNumber) {
 
-    return this._us.registrarUsuario(email,refreshtoken,accestoken,idReference,mirrorId);
+    return this._us.registrarUsuario(email,refreshtoken,accestoken,idReference,mirrorId,roomNumber);
 
   }
 

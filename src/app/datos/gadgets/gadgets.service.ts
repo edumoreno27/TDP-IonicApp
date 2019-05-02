@@ -14,7 +14,7 @@ export class GadgetsService {
     };
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
     
-    let url = proxyurl+'http://smartmirror-api.azurewebsites.net/GetGadgetStatus';
+    let url = 'http://edumoreno27-001-site2.etempurl.com/GetGadgetStatus';
     // let url = proxyurl+'http://edumoreno27-001-site1.etempurl.com/Gadget/ObtenerLista';
     return this.http.post(url, data)
       .toPromise()
@@ -35,7 +35,7 @@ export class GadgetsService {
     };
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
     
-    let url = proxyurl+'http://smartmirror-api.azurewebsites.net/GetGadgetOrder';
+    let url = 'http://edumoreno27-001-site2.etempurl.com/GetGadgetOrder';
     // let url = proxyurl+'http://edumoreno27-001-site1.etempurl.com/Gadget/ObtenerLista';
     return this.http.post(url, data)
       .toPromise()
@@ -53,7 +53,7 @@ export class GadgetsService {
 
     let data = {userId:userId,lstInside :lstInside};
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    let url = proxyurl+'http://smartmirror-api.azurewebsites.net/EditGadgetStatus';
+    let url = 'http://edumoreno27-001-site2.etempurl.com/EditGadgetStatus';
     // let url = proxyurl+'http://edumoreno27-001-site1.etempurl.com/Gadget/ActualizarLista';
     return this.http.post(url, data)
       .toPromise()
@@ -71,7 +71,7 @@ export class GadgetsService {
 
     let data = {userId:userId,lstInside :lstInside};
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    let url = proxyurl+'http://smartmirror-api.azurewebsites.net/EditGadgetOrder';
+    let url = 'http://edumoreno27-001-site2.etempurl.com/EditGadgetOrder';
     // let url = proxyurl+'http://edumoreno27-001-site1.etempurl.com/Gadget/ActualizarLista';
     return this.http.post(url, data)
       .toPromise()

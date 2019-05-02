@@ -7,16 +7,17 @@ export class UsuarioService {
 
   constructor(public http:Http) { }
 
-  registrarUsuario(email,refreshtoken,accestoken,idReference,mirrorId) {
+  registrarUsuario(email,refreshtoken,accestoken,idReference,mirrorId,roomNUmber) {
     
     let data = {email:email,      
         refreshtoken: refreshtoken,
           accesstoken: accestoken,          
           idReference:idReference,
-          mirrorId:mirrorId};
+          mirrorId:mirrorId,
+          roomNUmber:roomNUmber};
 
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    let url = proxyurl + 'http://smartmirror-api.azurewebsites.net/CreateUser';
+    let url =  'http://edumoreno27-001-site2.etempurl.com/CreateUser';
     return this.http.post(url, data)
       .toPromise()
       .then(data => {
@@ -38,7 +39,7 @@ export class UsuarioService {
           roomNumber: +roomNumber};
 
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    let url = proxyurl + 'http://smartmirror-api.azurewebsites.net/AfterLogout';
+    let url =  'http://edumoreno27-001-site2.etempurl.com/AfterLogout';
     return this.http.post(url, data)
       .toPromise()
       .then(data => {
@@ -67,5 +68,22 @@ export class UsuarioService {
       });
     });
   }
-  
+
+  ObtenerUsuarioByEmail(email){
+    
+    let url2 = 'https://tp-ires-api.azurewebsites.net/v1/management/email/';
+    let url = url2;
+    return new Promise(resolve => {
+      this.http.get(url + email).subscribe(data => {
+
+        let rs = data.json();
+        console.log(rs);
+        resolve(rs);
+      }, err => {
+        let rs = err.json();
+        console.log(rs);
+        resolve(rs);
+      });
+    });
+  }
 }

@@ -19,6 +19,7 @@ import {AngularFireAuthModule} from 'angularfire2/auth';
 import { IonicStorageModule } from '@ionic/storage';
 import {ModalOrderPageModule} from '../app/modal-order/modal-order.module';
 import { SpeechRecognition } from '@ionic-native/speech-recognition/ngx';
+import {Md5} from 'ts-md5/dist/md5';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBSISSOwwfhX6HrO8M8z683nGyJa77aIKo",
@@ -45,6 +46,7 @@ const firebaseConfig = {
     StatusBar,
     SpeechRecognition,
     SplashScreen,
+    Md5,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     NativeStorage,    
     GooglePlus,
