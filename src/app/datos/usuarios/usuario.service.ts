@@ -42,8 +42,8 @@ export class UsuarioService {
     let url =  'http://edumoreno27-001-site2.etempurl.com/AfterLogout';
     return this.http.post(url, data)
       .toPromise()
-      .then(data => {
-        let rs = data.json()
+      .then(result => {
+        let rs = result.json()
         return rs;
       }).catch(e => { console.log(e); return e; }
 

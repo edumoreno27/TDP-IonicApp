@@ -1,84 +1,86 @@
 <ion-header>
-    <ion-toolbar>
-        <ion-title>
-            Smart Mirror
-        </ion-title>
+    <ion-toolbar color="danger">
+        <ion-title *ngIf="logeado == false">Inicio de Sesión</ion-title>
+        <ion-title *ngIf="logeado == true">Bienvenido {{nombre}}</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="OpenPopOver($event)" *ngIf="logeado == true">
+                <ion-icon name="cog"></ion-icon>
+            </ion-button>
+        </ion-buttons>
     </ion-toolbar>
 </ion-header>
 
-<ion-content>
-    <div text-center>
-        <h1>Bienvenido a la aplicación del Hilton</h1>
-        <h1 style="white-space: normal !important; text-align: justify !important;     padding: 20px !important;
-        font-size: 20px !important;
-    " *ngIf="logeado == false">Esta aplicación servirá para poder interactuar con los gadgets que se muestran en el
-            Smart Mirror de la habitación.</h1>
-        <h2 *ngIf="logeado == true">{{nombre}}</h2>
-        <h2 *ngIf="logeado == true">{{correo}}</h2>
-        <br />
-    </div>
+<ion-content padding>
+
+
 
     <ion-grid>
-        <!-- <ion-row *ngIf="logeado == false">
-            <ion-col col-12 col-md-12>
-                <ion-item>
-                    <ion-input placeholder="Número de habitación" [(ngModel)]="numerohabitacion"></ion-input>
-                </ion-item>
+
+        <ion-card no-margin margin-bottom class="full-width">
+            <ion-row text-center>
+                <ion-card-header>
+                    <h1 *ngIf="logeado == true">Configuración del espejo</h1>
+                    <h1 *ngIf="logeado == false">Bienvenido a la aplicación móvil del Hotel Hilton</h1>
+                    <h1 style="white-space: normal !important; text-align: justify !important;     padding: 20px !important;
+                    font-size: 18px !important;" *ngIf="logeado == false">Esta aplicación servirá para poder interactuar con los gadgets que se muestran en el Smart Mirror de la habitación.</h1>
+                </ion-card-header>
+
+
+            </ion-row>
+
+            <ion-row text-center *ngIf="logeado == false">
+                <ion-img style="margin:auto ;width: 80%; height: 80%;" src="assets/img/smartmirror.jpg"></ion-img>
                 <br/>
-            </ion-col>
-        </ion-row>
-        -->
-        <ion-row *ngIf="logeado == false">
-            <ion-col>
-                <ion-button class="log-in-button" color="danger" expand="block" (click)="doGoogleLogin()">
-                    GOOGLE
-                </ion-button>
-            </ion-col>
-        </ion-row>
-        <!-- <div *ngIf="logeado == true" text-center>
+            </ion-row>
+
+            <br/>
+            <ion-row *ngIf="logeado == false">
+
+                <ion-col text-center>
+                    <ion-button style="width: 85%; margin:auto;" color="dark" (click)="doGoogleLogin()">
+
+                        GOOGLE LOGIN
+                    </ion-button>
+                </ion-col>
+            </ion-row>
+            <!-- <div *ngIf="logeado == true" text-center>
             <ion-button style="margin:auto !important; border-radius: 50px;" (click)="startGrabation()" color="primary"
                 shape="round">
                 <ion-icon style="color:white !important;" name="mic"></ion-icon>
             </ion-button>
             <br />
         </div> -->
-        <br />
-        <div *ngIf="logeado == true">
-            <ion-row *ngFor="let obj of arreglo" class="filaGadget">
 
-                <ion-col col-8>
-                    <ion-item (click)="abrirOrden(obj.order)" style="border: 0px; width:100%;" lines="none">
-                        <ion-label>{{obj?.description}}</ion-label>
-                    </ion-item>
-                </ion-col>
-                <ion-col col-4>
-                    <ion-item style="border: 0px; width:100%;" lines="none">
-                        <ion-toggle [checked]="obj.isActive" [(ngModel)]="obj.isActive" slot="end"
-                            id="{{obj?.gadgetId}}"></ion-toggle>
-                    </ion-item>
-                </ion-col>
+            <div *ngIf="logeado == true">
+                <ion-row *ngFor="let obj of arreglo" class="filaGadget">
 
-            </ion-row>
-        </div>
-        <br />
+                    <ion-col col-8>
+                        <ion-item (click)="abrirOrden(obj.order)" style="border: 0px; width:100%;" lines="none">
+                            <ion-label>{{obj?.description}}</ion-label>
+                        </ion-item>
+                    </ion-col>
+                    <ion-col col-4>
+                        <ion-item style="border: 0px; width:100%;" lines="none">
+                            <ion-toggle color="dark" [checked]="obj.isActive" [(ngModel)]="obj.isActive" slot="end" id="{{obj?.gadgetId}}"></ion-toggle>
+                        </ion-item>
+                    </ion-col>
 
+                </ion-row>
+            </div>
+            <br />
+        </ion-card>
     </ion-grid>
+
 </ion-content>
 <ion-footer>
     <ion-grid>
         <ion-row *ngIf="logeado == true">
             <ion-col>
-                <ion-button class="log-in-button" color="primary" expand="block" (click)="actualizargadgets()">
+                <ion-button class="log-in-button" color="dark" expand="block" (click)="actualizargadgets()">
                     ACTUALIZAR GADGETS
                 </ion-button>
             </ion-col>
         </ion-row>
-        <ion-row *ngIf="logeado == true">
-            <ion-col>
-                <ion-button class="log-in-button" color="danger" expand="block" (click)="logout()">
-                    CERRAR SESIÓN
-                </ion-button>
-            </ion-col>
-        </ion-row>
+
     </ion-grid>
 </ion-footer>

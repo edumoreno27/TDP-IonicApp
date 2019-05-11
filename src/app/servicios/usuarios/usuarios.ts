@@ -78,9 +78,15 @@ export class UsuariosProvider {
     return promesa;
   }
   delete() {
+    let promesa = new Promise((resolve, reject) => {
     this.storage.remove('user').then(data => {
+      this.usuario=null;
     });
     this.storage.remove('room').then(data => {
+      this.habitacion=null;
+      resolve();
     });
+  });
+  return promesa;
   }
 }

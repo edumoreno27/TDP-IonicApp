@@ -1,7 +1,8 @@
+import { PopupMenuPage } from './../popup-menu/popup-menu.page';
 import { Component } from '@angular/core';
 import { GooglePlus } from '@ionic-native/google-plus/ngx';
 import { SpeechRecognition } from '@ionic-native/speech-recognition/ngx';
-import { LoadingController, AlertController, Platform, ModalController } from '@ionic/angular';
+import { LoadingController, AlertController, Platform, ModalController, PopoverController } from '@ionic/angular';
 import { ModalOrderPage } from '../modal-order/modal-order.page';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
@@ -28,11 +29,12 @@ export class HomePage {
   usuario: any;
   numerohabitacion: any;
   repuesta: any;
+
   constructor(
-    private googlePlus: GooglePlus,
+    private googlePlus: GooglePlus, public popoverController: PopoverController,
     public loadingController: LoadingController,
     private router: Router, public _speech: SpeechRecognition,
-    private platform: Platform,
+    private platform: Platform, public _loadingController: LoadingController,
     public alertController: AlertController, public _usService: UsuarioService,
     public proveedor: GadgetsProvider, public modalController: ModalController,
     private afAuth: AngularFireAuth, public _us: UsuariosProvider
@@ -46,7 +48,7 @@ export class HomePage {
     this._us.cargar_storage().then(data => {
       console.log(this._us.usuario);
       this.usuario = this._us.usuario;
-
+      this.numerohabitacion = this._us.habitacion;
 
       console.log(this.usuario);
       if (this.usuario != undefined) {
@@ -67,7 +69,16 @@ export class HomePage {
 
   ionViewDidEnter() {
     console.log("ENTRO");
-    this.obtenerGadgets(this.usuario.id);
+    if (this.usuario) {
+      this.obtenerGadgets(this.usuario.id);
+    }
+
+    this._us.cargar_storage().then(data => {
+      console.log(this._us.usuario);
+      this.usuario = this._us.usuario;
+      this.numerohabitacion = this._us.habitacion;
+
+    });
   }
 
   ionViewDidLoad() {
@@ -83,14 +94,6 @@ export class HomePage {
     });
     loading.present();
 
-    // this._usService.obtenerUsuario(this.numerohabitacion).then(data=> {
-
-    //   this.repuesta=data;
-    //   if(this.repuesta.statusCode == 200){
-    //     if(this.repuesta.result){
-    //       if(this.repuesta.result.mirrorId != 0){
-
-
 
 
     this.googlePlus.login({
@@ -105,12 +108,12 @@ export class HomePage {
           console.log(this.repuesta);
           let idReference = undefined;
           let mirrorId = undefined;
-          let codigohabitacion=undefined;
+          let codigohabitacion = undefined;
           if (this.repuesta.statusCode == 200) {
             idReference = this.repuesta.result.cliente.ClienteId;
             mirrorId = this.repuesta.result.mirrorId;
-            codigohabitacion=this.repuesta.result.codigoHabitacion;
-            this.numerohabitacion=this.repuesta.result.cliente.ClienteId;
+            codigohabitacion = this.repuesta.result.codigoHabitacion;
+            this.numerohabitacion = this.repuesta.result.cliente.ClienteId;
           }
 
 
@@ -118,7 +121,7 @@ export class HomePage {
             this.nombre = user.displayName;
             this.correo = user.email;
             this.accesstoken = user.accessToken;
-            
+
             console.log(user);
 
             this.afAuth.auth.signInWithCredential(
@@ -128,7 +131,7 @@ export class HomePage {
 
               console.log(data);
               console.log(idReference);
-              this._us.registrarUsuario(user.email, user.serverAuthCode, this.accesstoken, idReference, mirrorId,codigohabitacion).then(usuario => {
+              this._us.registrarUsuario(user.email, user.serverAuthCode, this.accesstoken, idReference, mirrorId, codigohabitacion).then(usuario => {
                 console.log(usuario);
                 if (usuario.status == false) {
                   loading.dismiss();
@@ -136,6 +139,7 @@ export class HomePage {
                 }
                 else {
                   loading.dismiss();
+                  this.usuario = usuario;
                   this._us.guardar_storage(usuario, this.numerohabitacion).then(menu => {
                     this.presentAlert4();
 
@@ -242,18 +246,84 @@ export class HomePage {
     await alert.present();
   }
 
+  async presentarAlertaCerrarSesion(header, Mensaje) {
+    const alert = await this.alertController.create({
+      header: header,
+      message: Mensaje,
+      buttons: [{
+        text: 'Aceptar',
+        handler: () => {
+          this._us.delete().then(data => {
+
+            console.log("USUARIO ID", this.usuario.id);
+            console.log("ID REFERENCE", this.numerohabitacion);
+          });
+          this.logeado = false;
+          this.googlePlus.disconnect();
+        }
+      }]
+    });
+
+    await alert.present();
+  }
+
+
+  async presentarAlertaError(header, Mensaje, data) {
+    const alert = await this.alertController.create({
+      header: header,
+      message: Mensaje,
+      buttons: [{
+        text: 'Aceptar',
+        handler: () => {
+          console.log("ERROR", data.error);
+        }
+      }]
+    });
+
+    await alert.present();
+  }
   async presentLoading(loading) {
     return await loading.present();
   }
 
   async logout() {
-    this.logeado = false;
-    this.googlePlus.disconnect();
 
-    this._us.delete();
-    this._us.cerrarsesion(this._us.usuario.id, this._us.habitacion).then(usuario => {
+    const alert = await this.alertController.create({
+      header: 'Cerrando Sesión',
+      message: '¿Está seguro que desea cerrar sesión?',
+      buttons: [{
+        text: 'Cancelar',
+        handler: () => {
 
+        }
+      }, {
+        text: 'Aceptar',
+        handler: async () => {
+          let loadingElement = await this._loadingController.create({
+            message: 'Cerrando sesión...',
+            spinner: 'crescent'
+          });
+          loadingElement.present();
+          this._us.cerrarsesion(this.usuario.id, this.numerohabitacion).then(usuario => {
+            loadingElement.dismiss();
+            console.log("USUARIO ELIMINADO", this._us.usuario);
+            if (usuario.status == true) {
+
+              this.presentarAlertaCerrarSesion('Sesión cerrada', 'Su sesión fue cerrada correctamente');
+
+            } else {
+              this.presentarAlertaError('Error', 'No se pudo cerrar sesión correctamente', usuario);
+            }
+
+          });
+        }
+      }]
     });
+
+    await alert.present();
+
+
+
   }
 
   async obtenerGadgets(id) {
@@ -348,5 +418,24 @@ export class HomePage {
       }
 
     }
+  }
+
+  async OpenPopOver(args) {
+    const popover = await this.popoverController.create({
+      component: PopupMenuPage,
+      event: args,
+      translucent: false
+    });
+    popover.onDidDismiss().then(data => {
+      console.log("SE CERRO POP OVER", data);
+      let datos = data.data;
+      if (datos) {
+        if (datos.Tipo == 2) {
+          this.logout();
+        }
+      }
+
+    })
+    return await popover.present();
   }
 }

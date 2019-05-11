@@ -1,3 +1,4 @@
+import { PopupMenuPage } from './../popup-menu/popup-menu.page';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
@@ -18,6 +19,7 @@ import { HomePage } from './home.page';
       }
     ])
   ],
-  declarations: [HomePage]
+  declarations: [HomePage,PopupMenuPage],
+  entryComponents:[PopupMenuPage]
 })
 export class HomePageModule {}
