@@ -17,7 +17,7 @@ export class UsuarioService {
           roomNUmber:roomNUmber};
 
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    let url =  'http://edumoreno27-001-site2.etempurl.com/CreateUser';
+    let url =proxyurl+  'http://edumoreno27-001-site2.etempurl.com/CreateUser';
     return this.http.post(url, data)
       .toPromise()
       .then(data => {
@@ -39,7 +39,7 @@ export class UsuarioService {
           roomNumber: +roomNumber};
 
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    let url =  'http://edumoreno27-001-site2.etempurl.com/AfterLogout';
+    let url = proxyurl+ 'http://edumoreno27-001-site2.etempurl.com/AfterLogout';
     return this.http.post(url, data)
       .toPromise()
       .then(result => {
