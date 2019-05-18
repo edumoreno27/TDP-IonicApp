@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PopoverController } from '@ionic/angular';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-popup-menu',
   templateUrl: './popup-menu.page.html',
@@ -7,7 +8,7 @@ import { PopoverController } from '@ionic/angular';
 })
 export class PopupMenuPage implements OnInit {
 
-  constructor(private popoverCtrl: PopoverController) { }
+  constructor( private router: Router,private popoverCtrl: PopoverController) { }
 
   ngOnInit() {
   }
@@ -16,6 +17,7 @@ export class PopupMenuPage implements OnInit {
       await this.popoverCtrl.dismiss({
         Tipo: 1
       });
+      
     } catch (e) {
       //click more than one time popover throws error, so ignore...
     }

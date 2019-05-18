@@ -18,6 +18,7 @@ import {AngularFireModule} from 'angularfire2';
 import {AngularFireAuthModule} from 'angularfire2/auth';
 import { IonicStorageModule } from '@ionic/storage';
 import {ModalOrderPageModule} from '../app/modal-order/modal-order.module';
+import {InformationmirrorPageModule} from '../app/informationmirror/informationmirror.module';
 import { SpeechRecognition } from '@ionic-native/speech-recognition/ngx';
 import {Md5} from 'ts-md5/dist/md5';
 
@@ -40,7 +41,8 @@ const firebaseConfig = {
       AngularFireModule.initializeApp(firebaseConfig),
       AngularFireAuthModule,
     HttpClientModule,
-    ModalOrderPageModule,
+    InformationmirrorPageModule,
+    ModalOrderPageModule,    
     HttpModule],
   providers: [
     StatusBar,

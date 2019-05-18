@@ -425,6 +425,7 @@ export class HomePage {
       component: PopupMenuPage,
       event: args,
       translucent: false
+      
     });
     popover.onDidDismiss().then(data => {
       console.log("SE CERRO POP OVER", data);
@@ -432,6 +433,8 @@ export class HomePage {
       if (datos) {
         if (datos.Tipo == 2) {
           this.logout();
+        } else if(datos.Tipo == 1){
+          this.router.navigate(['/informationmirror']);
         }
       }
 
