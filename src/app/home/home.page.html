@@ -22,7 +22,7 @@
                     <h1 *ngIf="logeado == true">Configuración del espejo</h1>
                     <h1 *ngIf="logeado == false">Bienvenido a la aplicación móvil del Hotel Hilton</h1>
                     <h1 style="white-space: normal !important; text-align: justify !important;     padding: 20px !important;
-                    font-size: 18px !important;" *ngIf="logeado == false">Esta aplicación servirá para poder interactuar con los gadgets que se muestran en el Smart Mirror de la habitación.</h1>
+                    font-size: 18px !important;" *ngIf="logeado == false">Esta aplicación servirá para poder interactuar con los widgets que se muestran en el Smart Mirror de la habitación.</h1>
                 </ion-card-header>
 
 
@@ -77,7 +77,7 @@
         <ion-row *ngIf="logeado == true">
             <ion-col>
                 <ion-button class="log-in-button" color="dark" expand="block" (click)="actualizargadgets()">
-                    ACTUALIZAR GADGETS
+                    ACTUALIZAR WIDGETS
                 </ion-button>
             </ion-col>
         </ion-row>
