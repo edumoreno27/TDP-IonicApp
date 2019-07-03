@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
-import { GadgetsProvider } from '../servicios/gadgets/gadget';
-import { UsuariosProvider } from '../servicios/usuarios/usuarios';
+import { WidgetProvider } from '../servicios/widgets/widget';
+import { UserProvider } from '../servicios/users/user';
 
 @Component({
   selector: 'app-modal-order',
@@ -11,38 +11,22 @@ import { UsuariosProvider } from '../servicios/usuarios/usuarios';
 })
 export class ModalOrderPage implements OnInit {
   order: any;
-  orders: Array<any> = [];
-  color1: string;
-  arreglo: Array<any> = [];
-  colores: string[];
-  enviar: Array<any> = [];
+  orders: Array<any> = [];      
   description: any;
-  constructor(public _mcl: ModalController, public route: ActivatedRoute, public proveedor: GadgetsProvider, public _us: UsuariosProvider) {
-    this.order = this.route.snapshot.paramMap.get('orden');
-    this.proveedor.cargar_storage().then(data => {
-      this.orders = this.proveedor.orders;
-      this.inicializarArreglo(this.order);
-      console.log(this.order);
-      console.log(this.orders);
+  constructor(public _mcl: ModalController, public route: ActivatedRoute, public _wp: WidgetProvider, public _us: UserProvider) {
+    this.order = this.route.snapshot.paramMap.get('order');
+    this._wp.loadStorage().then(data => {
+      this.orders = this._wp.orders;
+      this.initializeArray(this.order);      
     });
 
-
-    //     this.route.params.subscribe(params => {
-    //       this.order = params['orden']; 
-    //       this.orders = params['orders']; 
-
-    //  });
 
   }
 
   ngOnInit() {
   }
 
-  // async dismiss() {
-  //   this._mcl.dismiss();
-  // }
-
-  inicializarArreglo(order) {
+  initializeArray(order) {
     for (let i = 0; i < this.orders.length; i++) {
       if (order == this.orders[i].order) {
         this.orders[i].selected = true;
@@ -55,53 +39,42 @@ export class ModalOrderPage implements OnInit {
     }
   }
 
-  CambiarOrden(obj) {
-    console.log(obj);
-    this.enviar = [];
-    let objeto = undefined;
+  ChangeOrder(obj) {     
+    
     let indexaux = this.orders.indexOf(obj);
-    let indice = 0;
+    let index = 0;
     for (let i = 0; i < this.orders.length; i++) {
       if (this.order == this.orders[i].order) {
-        indice = i;
-        console.log(i);
-        ///objeto = { description: this.orders[i].description, order: this.orders[i].order, selected: true, position: i };
+        index = i;        
       }
-    }
-    // this.order = obj.order;
+    }    
     
     let orderaux = this.orders[indexaux].order;
     let descriptionaux = this.orders[indexaux].description;
     let selectedaux = this.orders[indexaux].selected;
-    console.log(orderaux);
-    this.orders[indexaux].order = this.orders[indice].order;
-    this.orders[indexaux].description = this.orders[indice].description;
-    this.orders[indexaux].selected = this.orders[indice].selected;
+    
+    this.orders[indexaux].order = this.orders[index].order;
+    this.orders[indexaux].description = this.orders[index].description;
+    this.orders[indexaux].selected = this.orders[index].selected;
 
-    this.orders[indice].order = orderaux;
-    this.orders[indice].description = descriptionaux;
-    this.orders[indice].selected = selectedaux;
-
-
-
-
-    console.log(this.orders);
+    this.orders[index].order = orderaux;
+    this.orders[index].description = descriptionaux;
+    this.orders[index].selected = selectedaux;    
 
   }
 
-  actualizargadgets() {
+  updateOrderWidget() {
 
-    this._us.cargar_storage().then(data => {
-      this.proveedor.actualizarOrder(this._us.usuario.id, this.orders).then(orders => {
-        this.proveedor.guardar_storage(orders).then(data => {
-          this.orders = this.proveedor.orders;
+    this._us.loadStorage().then(data => {
+      this._wp.updateOrderWidget(this._us.user.id, this.orders).then(orders => {
+        this._wp.saveStorage(orders).then(data => {
+          this.orders = this._wp.orders;
           for (let i = 0; i < this.orders.length; i++) {
             if(this.orders[i].description == this.description){
               this.order=this.orders[i].order;
             }
-
           }
-          this.inicializarArreglo(this.order);
+          this.initializeArray(this.order);
         });
 
       });

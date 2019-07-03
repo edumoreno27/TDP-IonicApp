@@ -12,8 +12,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { GooglePlus } from '@ionic-native/google-plus/ngx';
 import { NativeStorage } from '@ionic-native/native-storage/ngx';
 import {MatchesOrderPipe} from '../app/servicios/filter/filter';
-import {GadgetsService} from './datos/gadgets/gadgets.service';
-import {UsuarioService} from './datos/usuarios/usuario.service';
+import {WidgetService} from './data/widgets/widget.service';
+import {UserService} from './data/users/user.service';
 import {AngularFireModule} from 'angularfire2';
 import {AngularFireAuthModule} from 'angularfire2/auth';
 import { IonicStorageModule } from '@ionic/storage';
@@ -52,8 +52,8 @@ const firebaseConfig = {
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     NativeStorage,    
     GooglePlus,
-    UsuarioService,
-    GadgetsService
+    UserService,
+    WidgetService
     
   ],
   bootstrap: [AppComponent]

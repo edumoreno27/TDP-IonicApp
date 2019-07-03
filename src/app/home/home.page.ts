@@ -6,12 +6,12 @@ import { LoadingController, AlertController, Platform, ModalController, PopoverC
 import { ModalOrderPage } from '../modal-order/modal-order.page';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { GadgetsProvider } from '../servicios/gadgets/gadget';
-import { UsuariosProvider } from '../servicios/usuarios/usuarios';
+import { WidgetProvider } from '../servicios/widgets/widget';
+import { UserProvider } from '../servicios/users/user';
 import * as firebase from 'firebase/app';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { zip } from 'rxjs';
-import { UsuarioService } from '../datos/usuarios/usuario.service';
+import { UserService } from '../data/users/user.service';
 import { md5 } from '../servicios/md5';
 
 @Component({
@@ -20,63 +20,50 @@ import { md5 } from '../servicios/md5';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  nombre: string = "";
-  correo: string = "";
+  name: string = "";
+  email: string = "";
   accesstoken: string = "";
-  logeado: boolean = false;
-  arreglo: Array<any> = [];
+  logged: boolean = false;
+  widgetarray: Array<any> = [];
   orders: Array<any> = [];
-  usuario: any;
-  numerohabitacion: any;
-  repuesta: any;
+  user: any;
+  roomnumber: any;
+  response: any;
 
   constructor(
     private googlePlus: GooglePlus, public popoverController: PopoverController,
     public loadingController: LoadingController,
     private router: Router, public _speech: SpeechRecognition,
     private platform: Platform, public _loadingController: LoadingController,
-    public alertController: AlertController, public _usService: UsuarioService,
-    public proveedor: GadgetsProvider, public modalController: ModalController,
-    private afAuth: AngularFireAuth, public _us: UsuariosProvider
+    public alertController: AlertController, public _usService: UserService,
+    public _wp: WidgetProvider, public modalController: ModalController,
+    private afAuth: AngularFireAuth, public _us: UserProvider
   ) {
-    let variablestring = 'edu.david2706@gmail.com';
-    console.log("variable antes dle md5", variablestring);
 
-    console.log(md5(variablestring));
-
-
-    this._us.cargar_storage().then(data => {
-      console.log(this._us.usuario);
-      this.usuario = this._us.usuario;
-      this.numerohabitacion = this._us.habitacion;
-
-      console.log(this.usuario);
-      if (this.usuario != undefined) {
-        console.log(" ENTRO AQUI");
-        this.logeado = true;
-        this.obtenerGadgets(this.usuario.id);
-        this.obtenerOrdenGadgets(this.usuario.id);
-        this.nombre = this.usuario.userName;
-        this.correo = this.usuario.email;
-
+    this._us.loadStorage().then(data => {
+      
+      this.user = this._us.user;
+      this.roomnumber = this._us.room;      
+      if (this.user != undefined) {        
+        this.logged = true;
+        this.obtainWidgets(this.user.id);
+        this.obtainOrderWidgets(this.user.id);
+        this.name = this.user.userName;
+        this.email = this.user.email;
       }
     });
-    // let idnuevo = 'e21cd1c7-cf5a-491b-b72f-37e7d4db105f';
-    // this.obtenerGadgets(idnuevo);
-    // this.obtenerOrdenGadgets(idnuevo);
 
   }
 
   ionViewDidEnter() {
-    console.log("ENTRO");
-    if (this.usuario) {
-      this.obtenerGadgets(this.usuario.id);
+    
+    if (this.user) {
+      this.obtainWidgets(this.user.id);
     }
 
-    this._us.cargar_storage().then(data => {
-      console.log(this._us.usuario);
-      this.usuario = this._us.usuario;
-      this.numerohabitacion = this._us.habitacion;
+    this._us.loadStorage().then(data => {      
+      this.user = this._us.user;
+      this.roomnumber = this._us.room;
 
     });
   }
@@ -88,13 +75,10 @@ export class HomePage {
   async doGoogleLogin() {
 
 
-
     const loading = await this.loadingController.create({
       message: 'Iniciando sesión...'
     });
     loading.present();
-
-
 
     this.googlePlus.login({
       'scopes': 'https://mail.google.com/ https://www.googleapis.com/auth/calendar',
@@ -102,47 +86,38 @@ export class HomePage {
       'offline': true,
     })
       .then(user => {
-        this._usService.ObtenerUsuarioByEmail(md5(user.email)).then(response => {
+        this._usService.obtainUserByEmail(md5(user.email)).then(response => {
 
-          this.repuesta = response;
-          console.log(this.repuesta);
+          this.response = response;          
           let idReference = undefined;
           let mirrorId = undefined;
-          let codigohabitacion = undefined;
-          if (this.repuesta.statusCode == 200) {
-            idReference = this.repuesta.result.cliente.ClienteId;
-            mirrorId = this.repuesta.result.mirrorId;
-            codigohabitacion = this.repuesta.result.codigoHabitacion;
-            this.numerohabitacion = this.repuesta.result.cliente.ClienteId;
-          }
-
-
-          if (this.repuesta.statusCode == 200) {
-            this.nombre = user.displayName;
-            this.correo = user.email;
-            this.accesstoken = user.accessToken;
-
-            console.log(user);
+          let roomcode = undefined;
+          
+          if (this.response.statusCode == 200) {
+            idReference = this.response.result.cliente.ClienteId;
+            mirrorId = this.response.result.mirrorId;
+            roomcode = this.response.result.codigoHabitacion;
+            this.roomnumber = this.response.result.cliente.ClienteId;
+            this.name = user.displayName;
+            this.email = user.email;
+            this.accesstoken = user.accessToken;            
 
             this.afAuth.auth.signInWithCredential(
               firebase.auth.GoogleAuthProvider.credential(user.idToken)
 
             ).then(data => {
 
-              console.log(data);
-              console.log(idReference);
-              this._us.registrarUsuario(user.email, user.serverAuthCode, this.accesstoken, idReference, mirrorId, codigohabitacion).then(usuario => {
-                console.log(usuario);
-                if (usuario.status == false) {
+              this._us.registerUser(user.email, user.serverAuthCode, this.accesstoken, idReference, mirrorId, roomcode).then(user => {
+                
+                if (user.status == false) {
                   loading.dismiss();
                   this.presentAlert3();
                 }
                 else {
                   loading.dismiss();
-                  this.usuario = usuario;
-                  this._us.guardar_storage(usuario, this.numerohabitacion).then(menu => {
+                  this.user = user;
+                  this._us.saveStorage(user, this.roomnumber).then(menu => {
                     this.presentAlert4();
-
                   });
                 }
               }
@@ -152,37 +127,23 @@ export class HomePage {
 
             });
 
-          } else if (this.repuesta.statusCode == 404) {
+          } else if (this.response.statusCode == 404) {
             loading.dismiss();
-            this.presentarAlerta('Error', 'Correo del huésped no se encuentra registrado')
+            this.presentAlert5('Error', 'email del huésped no se encuentra registrado')
           }
-
-
-
         });
-
-
-
-
-
       }, err => {
-        console.log(err);
+        
         if (!this.platform.is('cordova')) {
           this.presentAlert();
         }
         loading.dismiss();
       })
-
-
-
-
-
-
   }
 
   async presentAlert() {
     const alert = await this.alertController.create({
-      message: 'Cordova is not available on desktop. Please try this in a real device or in an emulator.',
+      message: 'Cordova no está disponible para PC. Prueba utilizando un dispositivo real o emulador.',
       buttons: ['OK']
     });
 
@@ -204,7 +165,7 @@ export class HomePage {
       buttons: [{
         text: 'OK',
         handler: () => {
-          this.logeado = false;
+          this.logged = false;
           this.googlePlus.logout();
         }
       }]
@@ -220,18 +181,16 @@ export class HomePage {
       buttons: [{
         text: 'OK',
         handler: () => {
-          this.logeado = true;
-
-          this.obtenerGadgets(this._us.usuario.id);
-          this.obtenerOrdenGadgets(this._us.usuario.id);
+          this.logged = true;
+          this.obtainWidgets(this._us.user.id);
+          this.obtainOrderWidgets(this._us.user.id);
         }
       }]
     });
-
     await alert.present();
   }
 
-  async presentarAlerta(header, Mensaje) {
+  async presentAlert5(header, Mensaje) {
     const alert = await this.alertController.create({
       header: header,
       message: Mensaje,
@@ -246,7 +205,7 @@ export class HomePage {
     await alert.present();
   }
 
-  async presentarAlertaCerrarSesion(header, Mensaje) {
+  async presentAlert6(header, Mensaje) {
     const alert = await this.alertController.create({
       header: header,
       message: Mensaje,
@@ -254,11 +213,8 @@ export class HomePage {
         text: 'Aceptar',
         handler: () => {
           this._us.delete().then(data => {
-
-            console.log("USUARIO ID", this.usuario.id);
-            console.log("ID REFERENCE", this.numerohabitacion);
           });
-          this.logeado = false;
+          this.logged = false;
           this.googlePlus.disconnect();
         }
       }]
@@ -268,14 +224,14 @@ export class HomePage {
   }
 
 
-  async presentarAlertaError(header, Mensaje, data) {
+  async presentAlert7(header, Mensaje, data) {
     const alert = await this.alertController.create({
       header: header,
       message: Mensaje,
       buttons: [{
         text: 'Aceptar',
         handler: () => {
-          console.log("ERROR", data.error);
+          
         }
       }]
     });
@@ -294,7 +250,6 @@ export class HomePage {
       buttons: [{
         text: 'Cancelar',
         handler: () => {
-
         }
       }, {
         text: 'Aceptar',
@@ -304,15 +259,15 @@ export class HomePage {
             spinner: 'crescent'
           });
           loadingElement.present();
-          this._us.cerrarsesion(this.usuario.id, this.numerohabitacion).then(usuario => {
+          this._us.signOut(this.user.id, this.roomnumber).then(user => {
             loadingElement.dismiss();
-            console.log("USUARIO ELIMINADO", this._us.usuario);
-            if (usuario.status == true) {
+            
+            if (user.status == true) {
 
-              this.presentarAlertaCerrarSesion('Sesión cerrada', 'Su sesión fue cerrada correctamente');
+              this.presentAlert6('Sesión cerrada', 'Su sesión fue cerrada correctamente');
 
             } else {
-              this.presentarAlertaError('Error', 'No se pudo cerrar sesión correctamente', usuario);
+              this.presentAlert7('Error', 'No se pudo cerrar sesión correctamente', user);
             }
 
           });
@@ -321,103 +276,39 @@ export class HomePage {
     });
 
     await alert.present();
-
-
-
   }
 
-  async obtenerGadgets(id) {
-    this.proveedor.obtenerGadgets(id).then(data => {
-      console.log(data);
-      this.arreglo = data;
+  async obtainWidgets(id) {
+    this._wp.obtainWidgets(id).then(data => {
+      
+      this.widgetarray = data;
     });
   }
 
-  async obtenerOrdenGadgets(id) {
-    this.proveedor.obtenerOrderGadgets(id).then(data => {
-      console.log(data);
+  async obtainOrderWidgets(id) {
+    this._wp.obtainOrderWidgets(id).then(data => {      
       this.orders = data;
     });
   }
-  async changeEstado(event) {
 
-  }
-  async actualizargadgets() {
-    this.proveedor.actualizar(this._us.usuario.id, this.arreglo).then(data => {
+  async updateStateWidget() {
+    this._wp.updateStateWidget(this._us.user.id, this.widgetarray).then(data => {
       if (data) {
-        this.arreglo = data;
-        // this.obtenerGadgets(1);
-        console.log("SE ACTUALIZO");
-
+        this.widgetarray = data;
       }
 
     });
   }
-  async abrirOrden(orden) {
-    this.proveedor.obtenerOrderGadgets(this._us.usuario.id).then(data => {
+  async openOrder(order) {
+    this._wp.obtainOrderWidgets(this._us.user.id).then(data => {
       this.orders = data;
-      this.proveedor.guardar_storage(this.orders).then(data => {
-        this.router.navigate(['/modal-order', { orden: orden, orders: this.orders }]);
+      this._wp.saveStorage(this.orders).then(data => {
+        this.router.navigate(['/modal-order', { order: order, orders: this.orders }]);
       });
 
     });
 
 
-  }
-  startGrabation() {
-    this._speech.startListening()
-      .subscribe(
-        (matches: Array<any>) => {
-          this.Analizar(matches);
-          console.log(matches)
-
-        },
-        (onerror) => console.log('error:', onerror)
-      )
-  }
-  Analizar(arreglo2) {
-    let bool = true;
-    for (let i = 0; i < arreglo2.length; i++) {
-      for (let j = 0; j < this.arreglo.length; j++) {
-        let variable = this.arreglo[j].description.toLowerCase();
-        if ((arreglo2[i].includes('mostrar') && arreglo2[i].includes(variable)) || (arreglo2[i].includes('Mostrar') && arreglo2[i].includes(variable))) {
-          // Found world  
-          console.log(variable);
-          // this.arreglo[j].isActive=true;   
-
-          if (this.arreglo[j].isActive == false) {
-            let elemtn = document.getElementById(this.arreglo[j].gadgetId);
-            elemtn.click();
-            bool = false;
-            this.actualizargadgets();
-            break;
-          }
-        }
-        if ((arreglo2[i].includes('ocultar') && arreglo2[i].includes(variable)) || (arreglo2[i].includes('Ocultar') && arreglo2[i].includes(variable))) {
-          // Found world  
-          console.log(variable);
-          // this.arreglo[j].isActive=false;          
-          if (this.arreglo[j].isActive == true) {
-            let elemtn = document.getElementById(this.arreglo[j].gadgetId);
-            elemtn.click();
-            bool = false;
-            this.actualizargadgets();
-            break;
-          }
-
-        }
-      }
-      if (bool == false) {
-        break;
-      }
-    }
-    for (let i = 0; i < arreglo2.length; i++) {
-      if (arreglo2[i].includes('actualizar')) {
-        this.actualizargadgets();
-        break;
-      }
-
-    }
   }
 
   async OpenPopOver(args) {
@@ -428,12 +319,12 @@ export class HomePage {
       
     });
     popover.onDidDismiss().then(data => {
-      console.log("SE CERRO POP OVER", data);
+      
       let datos = data.data;
       if (datos) {
-        if (datos.Tipo == 2) {
+        if (datos.Type == 2) {
           this.logout();
-        } else if(datos.Tipo == 1){
+        } else if(datos.Type == 1){
           this.router.navigate(['/informationmirror']);
         }
       }

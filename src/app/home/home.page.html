@@ -1,9 +1,9 @@
 <ion-header>
     <ion-toolbar color="danger">
-        <ion-title *ngIf="logeado == false">Inicio de Sesión</ion-title>
-        <ion-title *ngIf="logeado == true">Bienvenido {{nombre}}</ion-title>
+        <ion-title *ngIf="logged == false">Inicio de Sesión</ion-title>
+        <ion-title *ngIf="logged == true">Bienvenido {{name}}</ion-title>
         <ion-buttons slot="end">
-            <ion-button (click)="OpenPopOver($event)" *ngIf="logeado == true">
+            <ion-button (click)="OpenPopOver($event)" *ngIf="logged == true">
                 <ion-icon name="cog"></ion-icon>
             </ion-button>
         </ion-buttons>
@@ -19,43 +19,35 @@
         <ion-card no-margin margin-bottom class="full-width">
             <ion-row text-center>
                 <ion-card-header>
-                    <h1 *ngIf="logeado == true">Configuración del espejo</h1>
-                    <h1 *ngIf="logeado == false">Bienvenido a la aplicación móvil del Hotel Hilton</h1>
+                    <h1 *ngIf="logged == true">Configuración del espejo</h1>
+                    <h1 *ngIf="logged == false">Bienvenido a la aplicación móvil del Hotel Hilton</h1>
                     <h1 style="white-space: normal !important; text-align: justify !important;     padding: 20px !important;
-                    font-size: 18px !important;" *ngIf="logeado == false">Esta aplicación servirá para poder interactuar con los widgets que se muestran en el Smart Mirror de la habitación.</h1>
+                    font-size: 18px !important;" *ngIf="logged == false">Esta aplicación servirá para poder interactuar con los widgets que se muestran en el Smart Mirror de la habitación.</h1>
                 </ion-card-header>
 
 
             </ion-row>
 
-            <ion-row text-center *ngIf="logeado == false">
+            <ion-row text-center *ngIf="logged == false">
                 <ion-img style="margin:auto ;width: 80%; height: 80%;" src="assets/img/smartmirror.jpg"></ion-img>
                 <br/>
             </ion-row>
 
             <br/>
-            <ion-row *ngIf="logeado == false">
+            <ion-row *ngIf="logged == false">
 
                 <ion-col text-center>
                     <ion-button style="width: 85%; margin:auto;" color="dark" (click)="doGoogleLogin()">
-
                         GOOGLE LOGIN
                     </ion-button>
                 </ion-col>
-            </ion-row>
-            <!-- <div *ngIf="logeado == true" text-center>
-            <ion-button style="margin:auto !important; border-radius: 50px;" (click)="startGrabation()" color="primary"
-                shape="round">
-                <ion-icon style="color:white !important;" name="mic"></ion-icon>
-            </ion-button>
-            <br />
-        </div> -->
+            </ion-row>     
 
-            <div *ngIf="logeado == true">
-                <ion-row *ngFor="let obj of arreglo" class="filaGadget">
+            <div *ngIf="logged == true">
+                <ion-row *ngFor="let obj of widgetarray" class="filaGadget">
 
                     <ion-col col-8>
-                        <ion-item (click)="abrirOrden(obj.order)" style="border: 0px; width:100%;" lines="none">
+                        <ion-item (click)="openOrder(obj.order)" style="border: 0px; width:100%;" lines="none">
                             <ion-label>{{obj?.description}}</ion-label>
                         </ion-item>
                     </ion-col>
@@ -74,9 +66,9 @@
 </ion-content>
 <ion-footer>
     <ion-grid>
-        <ion-row *ngIf="logeado == true">
+        <ion-row *ngIf="logged == true">
             <ion-col>
-                <ion-button class="log-in-button" color="dark" expand="block" (click)="actualizargadgets()">
+                <ion-button class="log-in-button" color="dark" expand="block" (click)="updateStateWidget()">
                     ACTUALIZAR WIDGETS
                 </ion-button>
             </ion-col>
